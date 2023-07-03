@@ -1,0 +1,29 @@
+ITable
+IAccessor
+IWriteAccessor
+Record
+
+
+CMemTable
+CMemWriter
+CMemReader
+CMemReadAccessor
+CMemWriteAccessor
+
+
+// things to read
+-- what are the forms of polymorphism in C++ and compare with Java and C#
+    -java does not need method definition in interfaces, C++ does
+    -both interfaces' methods will be overridden if defined in class
+-- struct vs class in c++
+    -struct is public access by default, class is private access
+    -custom to structs used for POD(plain old data), classes used with methods
+    -can make structs and class behave the same with proper syntax
+
+create new table 
+get write accessor, memwriter and memreader
+push rows into it
+cmemreader takes csv returns table 
+
+-multithreading
+-pointer types
