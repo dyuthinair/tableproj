@@ -4,19 +4,19 @@
 /*                                               */
 /*************************************************/
 #include "IAccessor.hpp"
-#include "IWriteAccessor.hpp"
+#include "CMemWriteAccessor.hpp"
 #include <string>
 #include <unordered_map>
+#pragma once
 
 using namespace std;
 
-class CMemDeserializer {
+class CCSVDeserializer {
 
     void initMap();
-    void printTable(vector<Record*> *database);
+    
 
     public:
-        std::unordered_map<std::string, Type> enumMap;
-        CMemDeserializer();
+        CCSVDeserializer();
         void deserialize(string path, IWriteAccessor &tableWriter);
 };

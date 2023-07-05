@@ -17,17 +17,30 @@ enum Type
     Float
 };
 
-struct Record
+inline string toString(Type t)
 {
-    std::vector<std::string> strings;
-    std::vector<int> nums;
-    std::vector<float> floats;
-    friend std::istream& operator>>(std::istream& input, Record& r);
+    switch (t)
+    {
+        case String:   return "string";
+        case Int:   return "int";
+        case Float: return "float";
+    }
+}
+
+class Record
+{
+    public:
+        std::vector<std::string> strings;
+        std::vector<int> nums;
+        std::vector<float> floats;
 };
 
 class IAccessor
 {
-    int virtual getCols() = 0;
-    Type virtual getType() = 0;
+    public: 
+        int virtual getCols() = 0;
+        Type virtual getColType(int col) = 0;
+        string virtual getColName(int col) = 0;
+        Record virtual *getNextRecord() = 0;
 };
 

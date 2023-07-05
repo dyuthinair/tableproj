@@ -3,18 +3,12 @@
 /*                                               */
 /*                                               */
 /*************************************************/
-#include "CMemSerializer.hpp"
+#include "CMemReadAccessor.hpp"
+#pragma once
 
-using namespace std;
+class CCSVSerializer {
 
-CMemSerializer::CMemSerializer() {
-
-}
-
-void CMemSerializer::csv_serialize() {
-
-}
-
-void CMemSerializer::deserialize() {
-
-}
+    public:         
+        CCSVSerializer();
+        void serialize(string path, IAccessor &tableReader);
+};

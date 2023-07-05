@@ -10,13 +10,14 @@
             "name": "Launcher", 
             "type": "cppdbg",
             "request": "launch",
-            "program": "$C:\\work\\tableproj\\main.exe", //path to your programs exe and exe name
+            "program": "C:\\work\\tableproj\\main.exe", //path to your programs exe and exe name
             "args": [],
             "stopAtEntry": false,
-            "cwd": "$C:\\work\\tableproj",
+            "cwd": "C:\\MinGw\\bin",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
+            "miDebuggerPath": "C:\\MinGw\\bin\\gdb.exe",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

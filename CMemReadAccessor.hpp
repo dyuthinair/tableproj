@@ -5,10 +5,22 @@
 /*************************************************/
 
 #include "IAccessor.hpp"
+#pragma once
 
 class CMemReadAccessor : public IAccessor {
+
+    vector<string> *colNames;
+    vector<Type> *colTypes;
+    vector<Record*> *records;
+
+    unsigned int row;
+
     public:
-        CMemReadAccessor();
+        CMemReadAccessor(std::vector<string> *colNames, 
+            std::vector<Type> *colTypes, 
+            std::vector<Record*> *records);
         int getCols();
-        Type getType();
+        Type getColType(int col);
+        string getColName(int col);
+        Record* getNextRecord();
 };

@@ -27,3 +27,47 @@ cmemreader takes csv returns table
 
 -multithreading
 -pointer types
+- declaration of virtual functions returning pointer
+
+
+tasks
+--
+    Move metadata vectors to CMemTable
+    add data vector to cmemtable
+    fix write amd read accessors for cmemtable
+    complete serializer using read accessor
+    update deserializer usimg write accessor
+
+
+Scalar operator
+-- IScaOp 
+    Record Op(Record param1, Record param2, int col1, int col2)
+
+ScaOpEq
+    Eq
+    Gt
+    Lt
+    And
+    Or
+    Not
+
+
+--- table operators
+ITabOp
+    ITable Op(ITable)
+
+ITabJoin
+ITabSel
+
+ITabProj
+
+CNestedLoopJoin
+CMerjeJoin
+CHashJoin
+
+CFilter
+
+CProject
+
+
+

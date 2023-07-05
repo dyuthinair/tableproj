@@ -5,10 +5,9 @@
 /*************************************************/
 #include "CMemWriteAccessor.hpp"
 #include "CMemReadAccessor.hpp"
-
-using namespace std;
+#pragma once
 
 class ITable {
-    CMemReadAccessor virtual getAccessor() = 0;
-    CMemWriteAccessor virtual getWriteAccessor() = 0;
+    virtual IAccessor& getAccessor() = 0;
+    virtual IWriteAccessor& getWriteAccessor() = 0;
 };

@@ -3,7 +3,7 @@
 /*                                               */
 /*                                               */
 /*************************************************/
-#include "CMemDeserializer.hpp"
+#include "CCSVDeserializer.hpp"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -12,19 +12,25 @@ using namespace std;
 
 std::unordered_map<std::string, Type> enumMap;
 
-CMemDeserializer::CMemDeserializer() {
+CCSVDeserializer::CCSVDeserializer() {
     initMap();
 }
 
-void CMemDeserializer::initMap() {
+void CCSVDeserializer::initMap() {
     enumMap["string"] = String;
     enumMap["int"] = Int;
     enumMap["float"] = Float;
 }
 
-void CMemDeserializer::deserialize(string path, IWriteAccessor &tableWriter) {
+inline std::string trim(std::string& str)
+{
+    str.erase(str.find_last_not_of(' ')+1);         //suffixing spaces
+    str.erase(0, str.find_first_not_of(' '));       //prefixing spaces
+    return str;
+}
+
+void CCSVDeserializer::deserialize(string path, IWriteAccessor &tableWriter) {
     std::ifstream myfile(path);    
-    vector<Record*> table;
     std::string line;
     vector<string> colNames;
     vector<Type> colTypes;
@@ -32,7 +38,7 @@ void CMemDeserializer::deserialize(string path, IWriteAccessor &tableWriter) {
     while (std::getline(myfile, line))
     {
         std::stringstream iss(line);
-        Record* prow = isFirstRow ? new Record() : nullptr;
+        Record* prow = !isFirstRow ? new Record() : nullptr;
         int col = 0;
         while (iss.good())
         {
@@ -40,24 +46,25 @@ void CMemDeserializer::deserialize(string path, IWriteAccessor &tableWriter) {
             getline(iss, substr, ',');
             if (isFirstRow)
             {
-                int loop = 1;
                 for(std::string::iterator it=substr.begin(); it != substr.end(); it++)
                 {
                     if (*it==':')
                     {
-                        colNames.push_back(std::string(substr.begin(), it-1));
+                        string name = std::string(substr.begin(), it);
+                        trim(name);
+                        colNames.push_back(name);
                         string typeName  = std::string(it+1, substr.end());
+                        trim(typeName);
                         Type type = enumMap.at(typeName);
                         colTypes.push_back(type);
                         break;
                     }
-                    loop++;
                 }
+                col++;
             }
             else
             {
                 Type type = colTypes[col];
-                std::cout << type << "\n";
                 switch(type)
                 {
                     case String: 
@@ -67,7 +74,7 @@ void CMemDeserializer::deserialize(string path, IWriteAccessor &tableWriter) {
                         prow->nums.push_back(atoi(substr.c_str()));
                         break;
                     case Float: 
-                        prow->floats.push_back(atoi(substr.c_str()));
+                        prow->floats.push_back(atof(substr.c_str()));
                         break;
                 }
                 col++;
@@ -75,19 +82,11 @@ void CMemDeserializer::deserialize(string path, IWriteAccessor &tableWriter) {
         }
         if(isFirstRow) {
             isFirstRow = false;
+            tableWriter.setColNames(colNames);
+            tableWriter.setColTypes(colTypes);
         } else {
-            table.push_back(prow);
+            tableWriter.pushRow(prow);
         }
     }
-    printTable(&table);
-}
-
-void CMemDeserializer::printTable(vector<Record*> *table) {
-    std::cout << "s" << "\n";
-    for(Record* r : *table) {
-        std::cout << "s" << "\n";
-        for(string s : r->strings) {
-            std::cout << "s" << "\n";
-        }
-    }
+    myfile.close();
 }
