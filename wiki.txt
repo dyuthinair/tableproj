@@ -52,14 +52,19 @@ ScaOpEq
     Not
 
 
+IExpression
+    Apply(IScaOp)
+
 --- table operators
 ITabOp
     ITable Op(ITable)
 
 ITabJoin
+    -2 tables and a column name
 ITabSel
-
+    -1 table and a scalar operator
 ITabProj
+    -1 table and a vector of columns
 
 CNestedLoopJoin
 CMerjeJoin

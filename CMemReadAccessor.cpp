@@ -32,6 +32,7 @@ std::string CMemReadAccessor::getColName(int col) {
 Record* CMemReadAccessor::getNextRecord() {
     row++;
     if(row > records->size()) {
+        row = 0;
         return nullptr;
     } else {
         return records->at(row-1);

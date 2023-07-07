@@ -14,7 +14,9 @@ enum Type
 {
     String,
     Int,
-    Float
+    Float, 
+    Boolean,
+    EnumCount
 };
 
 inline string toString(Type t)
@@ -24,6 +26,7 @@ inline string toString(Type t)
         case String:   return "string";
         case Int:   return "int";
         case Float: return "float";
+        case Boolean: return "boolean";
     }
 }
 
@@ -33,6 +36,15 @@ class Record
         std::vector<std::string> strings;
         std::vector<int> nums;
         std::vector<float> floats;
+        std::vector<bool> booleans;
+
+        bool operator==(const Record &rhs ) {
+            return strings == rhs.strings
+            && nums == rhs.nums
+            && floats == rhs.floats
+            && booleans == rhs.booleans;
+        }   
+
 };
 
 class IAccessor
@@ -43,4 +55,5 @@ class IAccessor
         string virtual getColName(int col) = 0;
         Record virtual *getNextRecord() = 0;
 };
+
 
