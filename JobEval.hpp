@@ -10,5 +10,5 @@ class JobEval {
     unordered_set<IJob<IOp, R>*> traversed;
     public:
         JobEval() {};  
-        R* evalTree(IJob<IOp, R> *root); 
+        R evalTree(IJob<IOp, R> *root); 
 };

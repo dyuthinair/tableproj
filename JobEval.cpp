@@ -5,7 +5,7 @@
 using namespace std;
 
 template<typename IOp, typename R>
-R* JobEval<IOp, R>::evalTree(IJob<IOp, R> *root) {            
+R JobEval<IOp, R>::evalTree(IJob<IOp, R> *root) {            
     todo.push(root);
     while(!todo.empty()) {
         IJob<IOp, R>* cur = todo.top();

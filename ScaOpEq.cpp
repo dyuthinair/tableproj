@@ -17,7 +17,7 @@ void ScaOpEq::Op() {
     this->eval = BoolValue(val1->Value() == val2->Value());
 }
 
-Record* ScaOpEq::Value() {
+Record ScaOpEq::Value() {
     return eval.Value();
 }
 
@@ -50,10 +50,10 @@ void ScaOpAdd::Op()
                 throw("Cannot add strings"); 
                 break;
             case Int: 
-                this->eval = new IntValue(val1->Value()->nums.at(0) + val2->Value()->nums.at(0));
+                this->eval = new IntValue(val1->Value().nums.at(0) + val2->Value().nums.at(0));
                 break;
             case Float: 
-                this->eval = new FloatValue(val1->Value()->floats.at(0) + val2->Value()->floats.at(0));
+                this->eval = new FloatValue(val1->Value().floats.at(0) + val2->Value().floats.at(0));
                 break;
             case Boolean: 
                 throw("Cannot add booleanas"); 
@@ -67,7 +67,7 @@ void ScaOpAdd::Op()
     }
 }
 
-Record* ScaOpAdd::Value() {
+Record ScaOpAdd::Value() {
     return eval->Value();
 }
 

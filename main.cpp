@@ -66,12 +66,12 @@ void biggerTestWrite()
 */
 bool TestScaOpTree()
 {
-    ScaOpAdd *addNode = new ScaOpAdd(new IntValue(18), new IntValue(6));
+    ScaOpAdd *addNode = new ScaOpAdd(new IntValue(8), new IntValue(6));
     //addNode->Op();
     ScaOpEq *eqNode = new ScaOpEq(addNode, new IntValue(24));
     JobEval<IScalar, Record>* tree = new JobEval<IScalar, Record>();
-    Record *output = tree->evalTree(eqNode);
-    return output->booleans.at(0);
+    Record output = tree->evalTree(eqNode);
+    return output.booleans.at(0);
 }
 
 /*

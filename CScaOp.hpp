@@ -23,7 +23,7 @@ class ScaOpEq: public CScaOp
         ScaOpEq(IScalar *val1, IScalar *val2);
         //Record Op(std::vector<IVariable>& evalParams);
         void Op();
-        Record* Value();
+        Record Value();
         Type getType();
         vector<IJob<IScalar, Record>*>* getChildren();
 };
@@ -37,7 +37,7 @@ class ScaOpAdd: public CScaOp
     public:
         ScaOpAdd(IScalar *val1, IScalar *val2);
         void Op();
-        Record* Value();
+        Record Value();
         Type getType();
         vector<IJob<IScalar, Record>*>* getChildren();
 };

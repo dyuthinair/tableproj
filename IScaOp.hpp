@@ -12,7 +12,7 @@
 class IScalar : public IJob<IScalar,Record>{
     public:
         virtual Type getType() = 0;
-        virtual Record* Value() = 0;
+        virtual Record Value() = 0;
         virtual void Op() = 0;
         
 };
@@ -21,7 +21,7 @@ class IVariable:public IScalar {
     public:
         virtual string Name() = 0;
         virtual Type getType() = 0;
-        virtual Record* Value() = 0;
+        virtual Record Value() = 0;
 };
 
 class IScaOp: public IScalar, public IOp {
@@ -36,7 +36,7 @@ class CConstVal: public IScalar, public R {
 
     public:
         virtual Type getType() = 0;
-        virtual Record* Value() = 0;
+        virtual Record Value() = 0;
         virtual void Op() {};
 };
 
@@ -49,7 +49,7 @@ class CVarVal: public IVariable {
         CVarVal(string name, Type type, Record val);
         string Name();
         Type getType();
-        Record* Value();
+        Record Value();
         
 };
 
@@ -61,9 +61,9 @@ class IntValue: public Record, public CConstVal
         {
             nums.push_back(value);
         }
-        virtual Record* Value()
+        virtual Record Value()
         {
-            return this;
+            return *this;
         }
         virtual Type getType() {
             return Int;
@@ -82,9 +82,9 @@ class StringValue: public Record, public CConstVal
         {
             strings.push_back(value);
         }
-        virtual Record* Value()
+        virtual Record Value()
         {
-            return this;
+            return *this;
         }
         virtual Type getType() {
             return String;
@@ -103,9 +103,9 @@ class FloatValue: public Record, public CConstVal
         {
             floats.push_back(value);
         }
-        virtual Record* Value()
+        virtual Record Value()
         {
-            return this;
+            return *this;
         }
         virtual Type getType() {
             return Float;
@@ -124,9 +124,9 @@ class BoolValue: public Record, public CConstVal
         {
             booleans.push_back(value);
         }
-        virtual Record* Value()
+        virtual Record Value()
         {
-            return this;
+            return *this;
         }
         virtual Type getType() {
             return Boolean;
