@@ -69,7 +69,7 @@ bool TestScaOpTree()
     auto addNode = new ScaOpAdd(new IntValue(18), new IntValue(6));
     //addNode->Op();
     auto tree = new ScaOpEq(addNode, new IntValue(2));
-    tree->Op();
+    
     return tree->Value().booleans.at(0);
 }
 

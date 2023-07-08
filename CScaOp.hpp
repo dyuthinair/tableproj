@@ -10,6 +10,7 @@ class CScaOp: public IScaOp {
     //virtual Record op(std::vector<IVariable>& evalParams) = 0;
     virtual Record Op() = 0;
     Record rootEval();
+
 };
 
 class ScaOpEq: public CScaOp
@@ -24,6 +25,7 @@ class ScaOpEq: public CScaOp
         Record Op();
         Record Value();
         Type getType();
+        vector<IJob<IScalar, Record>*>* getChildren();
 };
 
 class ScaOpAdd: public CScaOp
@@ -37,6 +39,7 @@ class ScaOpAdd: public CScaOp
         Record Op();
         Record Value();
         Type getType();
+        vector<IJob<IScalar, Record>*>* getChildren();
 };
 
 /*

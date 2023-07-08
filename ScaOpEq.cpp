@@ -30,6 +30,12 @@ Type ScaOpEq::getType() {
     }
 }
 
+vector<IJob<IScalar, Record>*>* ScaOpAdd::getChildren() {
+    vector<IJob*>* children = new vector<IJob*>();
+    children->push_back(val1);
+    children->push_back(val2);
+}
+
 ScaOpAdd::ScaOpAdd(IScalar *val1, IScalar *val2) 
  : val1(val1), val2(val2)
 {
@@ -69,6 +75,12 @@ Type ScaOpAdd::getType() {
     } else {
         throw("Type mismatch");
     }
+}
+
+vector<IJob<IScalar, Record>*>* ScaOpAdd::getChildren() {
+    vector<IJob*>* children = new vector<IJob*>();
+    children->push_back(val1);
+    children->push_back(val2);
 }
 
 /*

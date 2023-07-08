@@ -4,14 +4,17 @@
 /*                                               */
 /*************************************************/
 #include "IAccessor.hpp"
+#include "ijob.hpp"
 #pragma once
 
-class IScalar {
+
+
+class IScalar : public IJob<IScalar,Record>{
     public:
         virtual Type getType() = 0;
         virtual Record Value() = 0;
-        virtual IScalar* Op() = 0;
-
+        virtual Record Op() = 0;
+        
 };
 
 class IVariable:public IScalar {
@@ -21,13 +24,13 @@ class IVariable:public IScalar {
         virtual Record Value() = 0;
 };
 
-class IScaOp: public IScalar {
+class IScaOp: public IScalar, public IOp {
     public:
         //virtual Record op(IScalar& param1, IScalar& param2, std::vector<IVariable>& evalParams) = 0;
         //virtual Record op(IScalar& param1, std::vector<IVariable>& evalParams) = 0;
 };
 
-class CConstVal: public IScalar {
+class CConstVal: public IScalar, public R {
 
     Type type;
 
@@ -46,6 +49,7 @@ class CVarVal: public IVariable {
         string Name();
         Type getType();
         Record Value();
+        
 };
 
 class IntValue: public Record, public CConstVal
@@ -62,6 +66,13 @@ class IntValue: public Record, public CConstVal
         }
         virtual Type getType() {
             return Int;
+        }
+        virtual vector<IJob<IScalar, Record>*>* getChildren() {
+            vector<IJob<IScalar, Record>*>* none = new vector<IJob<IScalar, Record>*>;
+            return none;
+        }
+        virtual Record Op() {
+            return *this;
         }
 };
 
@@ -80,6 +91,13 @@ class StringValue: public Record, public CConstVal
         virtual Type getType() {
             return String;
         }
+        virtual vector<IJob<IScalar, Record>*>* getChildren() {
+            vector<IJob<IScalar, Record>*>* none = new vector<IJob<IScalar, Record>*>;
+            return none;
+        }
+        virtual Record Op() {
+            return *this;
+        }
 };
 
 class FloatValue: public Record, public CConstVal
@@ -96,6 +114,13 @@ class FloatValue: public Record, public CConstVal
         }
         virtual Type getType() {
             return Float;
+        }
+        virtual vector<IJob<IScalar, Record>*>* getChildren() {
+            vector<IJob<IScalar, Record>*>* none = new vector<IJob<IScalar, Record>*>;
+            return none;
+        }
+        virtual Record Op() {
+            return *this;
         }
 };
 
@@ -114,9 +139,12 @@ class BoolValue: public Record, public CConstVal
         virtual Type getType() {
             return Boolean;
         }
+        virtual vector<IJob<IScalar, Record>*>* getChildren() {
+            vector<IJob<IScalar, Record>*>* none = new vector<IJob<IScalar, Record>*>;
+            return none;
+        }
+        virtual Record Op() {
+            return *this;
+        }
 };
 
-class CEval {
-    public:
-        IScalar CScalarEva
-}
