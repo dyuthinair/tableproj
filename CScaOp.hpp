@@ -6,11 +6,11 @@
 #include "IScaOp.hpp"
 #pragma once
 
+using namespace std;
+
 class CScaOp: public IScaOp {
     //virtual Record op(std::vector<IVariable>& evalParams) = 0;
-    virtual Record Op() = 0;
-    Record rootEval();
-
+    virtual void Op() = 0;
 };
 
 class ScaOpEq: public CScaOp
@@ -22,8 +22,8 @@ class ScaOpEq: public CScaOp
     public:
         ScaOpEq(IScalar *val1, IScalar *val2);
         //Record Op(std::vector<IVariable>& evalParams);
-        Record Op();
-        Record Value();
+        void Op();
+        Record* Value();
         Type getType();
         vector<IJob<IScalar, Record>*>* getChildren();
 };
@@ -36,8 +36,8 @@ class ScaOpAdd: public CScaOp
     
     public:
         ScaOpAdd(IScalar *val1, IScalar *val2);
-        Record Op();
-        Record Value();
+        void Op();
+        Record* Value();
         Type getType();
         vector<IJob<IScalar, Record>*>* getChildren();
 };
@@ -54,8 +54,7 @@ class ScaOpAnd: public CScaOp
         Record Op();
         Record Value();
         Type getType();
-};
-/**/
+};*/
 
 
 

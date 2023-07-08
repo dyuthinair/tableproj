@@ -6,6 +6,7 @@
 /*************************************************/
 #include <vector>
 #include <string>
+#include "IJob.hpp"
 
 using namespace std;
 
@@ -23,14 +24,20 @@ inline string toString(Type t)
 {
     switch (t)
     {
-        case String:   return "string";
-        case Int:   return "int";
-        case Float: return "float";
-        case Boolean: return "boolean";
+        case String:   
+            return "string";
+        case Int:   
+            return "int";
+        case Float: 
+            return "float";
+        case Boolean: 
+            return "boolean";
+        case EnumCount: 
+            throw("Not a real type");
     }
 }
 
-class Record
+class Record : public R
 {
     public:
         std::vector<std::string> strings;

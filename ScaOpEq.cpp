@@ -13,13 +13,12 @@ ScaOpEq::ScaOpEq(IScalar *val1, IScalar *val2)
     
 }
 
-Record ScaOpEq::Op() {
+void ScaOpEq::Op() {
     this->eval = BoolValue(val1->Value() == val2->Value());
-    return eval;
 }
 
-Record ScaOpEq::Value() {
-    return eval;
+Record* ScaOpEq::Value() {
+    return eval.Value();
 }
 
 Type ScaOpEq::getType() {
@@ -30,10 +29,11 @@ Type ScaOpEq::getType() {
     }
 }
 
-vector<IJob<IScalar, Record>*>* ScaOpAdd::getChildren() {
+vector<IJob<IScalar, Record>*>* ScaOpEq::getChildren() {
     vector<IJob*>* children = new vector<IJob*>();
     children->push_back(val1);
     children->push_back(val2);
+    return children;
 }
 
 ScaOpAdd::ScaOpAdd(IScalar *val1, IScalar *val2) 
@@ -42,7 +42,7 @@ ScaOpAdd::ScaOpAdd(IScalar *val1, IScalar *val2)
     
 }
 
-Record ScaOpAdd::Op()
+void ScaOpAdd::Op()
 {
     if(val1->getType() == val2->getType()) {
         switch(val1->getType()) {
@@ -50,22 +50,24 @@ Record ScaOpAdd::Op()
                 throw("Cannot add strings"); 
                 break;
             case Int: 
-                this->eval = new IntValue(val1->Value().nums.at(0) + val2->Value().nums.at(0));
+                this->eval = new IntValue(val1->Value()->nums.at(0) + val2->Value()->nums.at(0));
                 break;
             case Float: 
-                this->eval = new FloatValue(val1->Value().floats.at(0) + val2->Value().floats.at(0));
+                this->eval = new FloatValue(val1->Value()->floats.at(0) + val2->Value()->floats.at(0));
                 break;
             case Boolean: 
                 throw("Cannot add booleanas"); 
+                break;
+            case EnumCount:
+                throw("Not a real type");
                 break;
         }
     }  else {
         throw("Type mismatch");
     }
-    return eval->Value();
 }
 
-Record ScaOpAdd::Value() {
+Record* ScaOpAdd::Value() {
     return eval->Value();
 }
 
@@ -81,6 +83,7 @@ vector<IJob<IScalar, Record>*>* ScaOpAdd::getChildren() {
     vector<IJob*>* children = new vector<IJob*>();
     children->push_back(val1);
     children->push_back(val2);
+    return children;
 }
 
 /*

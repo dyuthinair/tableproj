@@ -76,6 +76,20 @@ void CCSVDeserializer::deserialize(string path, IWriteAccessor &tableWriter) {
                     case Float: 
                         prow->floats.push_back(atof(substr.c_str()));
                         break;
+                    case Boolean: 
+                        bool val;
+                        if(substr.compare("True") == 0 || substr.compare("true") == 0) {
+                            val = true;
+                        } else if(substr.compare("False") == 0 || substr.compare("false") == 0){
+                            val = false;
+                        } else {
+                            throw("Invalid boolean value");
+                        }
+                        prow->booleans.push_back(val);
+                        break;
+                    case EnumCount:
+                        throw("Invalid type");
+                        break;
                 }
                 col++;
             }

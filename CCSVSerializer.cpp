@@ -27,25 +27,47 @@ void CCSVSerializer::serialize(string path, IAccessor &tableReader) {
     Record *record = tableReader.getNextRecord();
     while(record != nullptr) {
         string row = "";
-        int strIndex = 0;
-        int numIndex = 0;
-        int floatIndex = 0;
+        vector<int> indeces (EnumCount, 0);
         for(int i = 0; i < tableReader.getCols(); i++) {
             Type type = tableReader.getColType(i);
             switch(type)
             {
                 case String: 
-                    row += record->strings.at(strIndex);
-                    strIndex++;
+                {
+                    row += record->strings.at(indeces[String]);
+                    indeces[String]++;
                     break;
+                }
                 case Int: 
-                    row += to_string(record->nums.at(numIndex));
-                    numIndex++;
+                {
+                    row += to_string(record->nums.at(indeces[Int]));
+                    indeces[Int]++;
                     break;
+                }
                 case Float: 
-                    row += to_string(record->floats.at(floatIndex));
-                    floatIndex++;
+                {
+                    row += to_string(record->floats.at(indeces[Float]));
+                    indeces[Float]++;
                     break;
+                }
+                case Boolean:
+                {
+                    bool val = record->booleans.at(indeces[Boolean]);
+                    indeces[Boolean]++;
+                    if(val == true) {
+                        row +="True";
+                    } else if(val == false) {
+                        row += "False";
+                    } else {
+                        throw("Invalid boolean value");
+                    }
+                    break;
+                }
+                case EnumCount:
+                {
+                    throw("Invalid type");
+                    break;
+                }
             }
             row += ", ";
         }

@@ -5,8 +5,8 @@
 #include "CMemTable.hpp"
 #include "CCSVDeserializer.hpp"
 #include "CCSVSerializer.hpp"
-#include "IScaOp.hpp"
 #include "CScaOp.hpp"
+#include "JobEval.hpp"
 
 using namespace std;
 
@@ -66,11 +66,12 @@ void biggerTestWrite()
 */
 bool TestScaOpTree()
 {
-    auto addNode = new ScaOpAdd(new IntValue(18), new IntValue(6));
+    ScaOpAdd *addNode = new ScaOpAdd(new IntValue(18), new IntValue(6));
     //addNode->Op();
-    auto tree = new ScaOpEq(addNode, new IntValue(2));
-    
-    return tree->Value().booleans.at(0);
+    ScaOpEq *eqNode = new ScaOpEq(addNode, new IntValue(24));
+    JobEval<IScalar, Record>* tree = new JobEval<IScalar, Record>();
+    Record *output = tree->evalTree(eqNode);
+    return output->booleans.at(0);
 }
 
 /*

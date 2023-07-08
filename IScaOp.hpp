@@ -4,7 +4,7 @@
 /*                                               */
 /*************************************************/
 #include "IAccessor.hpp"
-#include "ijob.hpp"
+#include "IJob.hpp"
 #pragma once
 
 
@@ -12,8 +12,8 @@
 class IScalar : public IJob<IScalar,Record>{
     public:
         virtual Type getType() = 0;
-        virtual Record Value() = 0;
-        virtual Record Op() = 0;
+        virtual Record* Value() = 0;
+        virtual void Op() = 0;
         
 };
 
@@ -21,7 +21,7 @@ class IVariable:public IScalar {
     public:
         virtual string Name() = 0;
         virtual Type getType() = 0;
-        virtual Record Value() = 0;
+        virtual Record* Value() = 0;
 };
 
 class IScaOp: public IScalar, public IOp {
@@ -36,7 +36,8 @@ class CConstVal: public IScalar, public R {
 
     public:
         virtual Type getType() = 0;
-        virtual Record Value() = 0;
+        virtual Record* Value() = 0;
+        virtual void Op() {};
 };
 
 class CVarVal: public IVariable {
@@ -48,7 +49,7 @@ class CVarVal: public IVariable {
         CVarVal(string name, Type type, Record val);
         string Name();
         Type getType();
-        Record Value();
+        Record* Value();
         
 };
 
@@ -60,9 +61,9 @@ class IntValue: public Record, public CConstVal
         {
             nums.push_back(value);
         }
-        virtual Record Value()
+        virtual Record* Value()
         {
-            return *this;
+            return this;
         }
         virtual Type getType() {
             return Int;
@@ -70,9 +71,6 @@ class IntValue: public Record, public CConstVal
         virtual vector<IJob<IScalar, Record>*>* getChildren() {
             vector<IJob<IScalar, Record>*>* none = new vector<IJob<IScalar, Record>*>;
             return none;
-        }
-        virtual Record Op() {
-            return *this;
         }
 };
 
@@ -84,9 +82,9 @@ class StringValue: public Record, public CConstVal
         {
             strings.push_back(value);
         }
-        virtual Record Value()
+        virtual Record* Value()
         {
-            return *this;
+            return this;
         }
         virtual Type getType() {
             return String;
@@ -94,9 +92,6 @@ class StringValue: public Record, public CConstVal
         virtual vector<IJob<IScalar, Record>*>* getChildren() {
             vector<IJob<IScalar, Record>*>* none = new vector<IJob<IScalar, Record>*>;
             return none;
-        }
-        virtual Record Op() {
-            return *this;
         }
 };
 
@@ -108,9 +103,9 @@ class FloatValue: public Record, public CConstVal
         {
             floats.push_back(value);
         }
-        virtual Record Value()
+        virtual Record* Value()
         {
-            return *this;
+            return this;
         }
         virtual Type getType() {
             return Float;
@@ -118,9 +113,6 @@ class FloatValue: public Record, public CConstVal
         virtual vector<IJob<IScalar, Record>*>* getChildren() {
             vector<IJob<IScalar, Record>*>* none = new vector<IJob<IScalar, Record>*>;
             return none;
-        }
-        virtual Record Op() {
-            return *this;
         }
 };
 
@@ -132,9 +124,9 @@ class BoolValue: public Record, public CConstVal
         {
             booleans.push_back(value);
         }
-        virtual Record Value()
+        virtual Record* Value()
         {
-            return *this;
+            return this;
         }
         virtual Type getType() {
             return Boolean;
@@ -142,9 +134,6 @@ class BoolValue: public Record, public CConstVal
         virtual vector<IJob<IScalar, Record>*>* getChildren() {
             vector<IJob<IScalar, Record>*>* none = new vector<IJob<IScalar, Record>*>;
             return none;
-        }
-        virtual Record Op() {
-            return *this;
         }
 };
 
