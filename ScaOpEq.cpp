@@ -13,7 +13,7 @@ ScaOpEq::ScaOpEq(IScalar *val1, IScalar *val2)
     
 }
 
-void ScaOpEq::Op() {
+void ScaOpEq::Op(vector<IVariable*>& params) {
     this->eval = BoolValue(val1->Value() == val2->Value());
 }
 
@@ -29,7 +29,7 @@ Type ScaOpEq::getType() {
     }
 }
 
-vector<IJob<IScalar, Record>*>* ScaOpEq::getChildren() {
+vector<IJob<IScalar, Record, vector<IVariable*>>*>* ScaOpEq::getChildren() {
     vector<IJob*>* children = new vector<IJob*>();
     children->push_back(val1);
     children->push_back(val2);
@@ -42,18 +42,22 @@ ScaOpAdd::ScaOpAdd(IScalar *val1, IScalar *val2)
     
 }
 
-void ScaOpAdd::Op()
+void ScaOpAdd::Op(vector<IVariable*>& params)
 {
+    ITracer::GetTracer()->Trace("ScaOpAdd::Op called");
+
     if(val1->getType() == val2->getType()) {
         switch(val1->getType()) {
             case String: 
                 throw("Cannot add strings"); 
                 break;
             case Int: 
-                this->eval = new IntValue(val1->Value().nums.at(0) + val2->Value().nums.at(0));
+                this->result = new IntValue(val1->Value().nums.at(0) + val2->Value().nums.at(0));
+                ITracer::GetTracer()->Trace("ScaOpAdd::Op result %d\n",  result->Value().nums.at(0));
                 break;
             case Float: 
-                this->eval = new FloatValue(val1->Value().floats.at(0) + val2->Value().floats.at(0));
+                this->result = new FloatValue(val1->Value().floats.at(0) + val2->Value().floats.at(0));
+                ITracer::GetTracer()->Trace("ScaOpAdd::Op result %f\n",  result->Value().floats.at(0));
                 break;
             case Boolean: 
                 throw("Cannot add booleanas"); 
@@ -68,7 +72,7 @@ void ScaOpAdd::Op()
 }
 
 Record ScaOpAdd::Value() {
-    return eval->Value();
+    return result->Value();
 }
 
 Type ScaOpAdd::getType() {
@@ -79,7 +83,7 @@ Type ScaOpAdd::getType() {
     }
 }
 
-vector<IJob<IScalar, Record>*>* ScaOpAdd::getChildren() {
+vector<IJob<IScalar, Record, vector<IVariable*>>*>* ScaOpAdd::getChildren() {
     vector<IJob*>* children = new vector<IJob*>();
     children->push_back(val1);
     children->push_back(val2);

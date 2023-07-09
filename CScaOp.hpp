@@ -3,14 +3,13 @@
 /*                                               */
 /*                                               */
 /*************************************************/
-#include "IScaOp.hpp"
 #pragma once
+#include "IScaOp.hpp"
 
 using namespace std;
 
 class CScaOp: public IScaOp {
-    //virtual Record op(std::vector<IVariable>& evalParams) = 0;
-    virtual void Op() = 0;
+    virtual void Op(vector<IVariable*>& params) = 0;
 };
 
 class ScaOpEq: public CScaOp
@@ -21,25 +20,24 @@ class ScaOpEq: public CScaOp
 
     public:
         ScaOpEq(IScalar *val1, IScalar *val2);
-        //Record Op(std::vector<IVariable>& evalParams);
-        void Op();
+        void Op(vector<IVariable*>& params);
         Record Value();
         Type getType();
-        vector<IJob<IScalar, Record>*>* getChildren();
+        vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren();
 };
 
 class ScaOpAdd: public CScaOp
 {
-    IScalar *eval;
+    IScalar *result;
     IScalar *val1;
     IScalar *val2;
     
     public:
         ScaOpAdd(IScalar *val1, IScalar *val2);
-        void Op();
+        void Op(vector<IVariable*>& params);
         Record Value();
         Type getType();
-        vector<IJob<IScalar, Record>*>* getChildren();
+        vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren();
 };
 
 /*

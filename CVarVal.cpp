@@ -4,17 +4,35 @@
 /*                                               */
 /*************************************************/
 #include "IScaOp.hpp"
+#include <iostream>
 
+using namespace std;
 
-CVarVal::CVarVal(StringType type, Record val) {
+CVarRef::CVarRef(Type type, string name) {
     this->type = type;
-    this->value = val;
+    this->name = name;
 }
 
-Type CConstVal::getType() {
+Type CVarRef::getType() {
     return type;
 }
 
-Record CConstVal::Value() {
-    return value;
+string CVarRef::Name() {
+    return name;
+}
+
+Record CVarRef::Value() {
+    return *value;
+}
+
+void CVarRef::Op(vector<IVariable*>& params) {
+    for(IVariable* curVar : params) {
+        if(curVar->Name().compare(this->name) == 0 && curVar->getType() == this->type) {
+            Record *var = new Record();
+            var->copy(curVar->Value());
+            value = var;
+
+            ITracer::GetTracer()->Trace("CVarRef::Op value of %s is %d.\n", curVar->Name().c_str(), value->nums.at(0));
+        }
+    }
 }

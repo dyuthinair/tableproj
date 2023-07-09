@@ -4,13 +4,15 @@
 /*                                               */
 /*                                               */
 /*************************************************/
+#pragma once
+
 #include <vector>
 #include <string>
 #include "IJob.hpp"
+#include "itracer.hpp"
 
 using namespace std;
 
-#pragma once
 enum Type
 {
     String,
@@ -35,6 +37,7 @@ inline string toString(Type t)
         case EnumCount: 
             throw("Not a real type");
     }
+    throw("Unreachable code");
 }
 
 class Record : public R
@@ -51,6 +54,21 @@ class Record : public R
             && floats == rhs.floats
             && booleans == rhs.booleans;
         }   
+
+        void copy(const Record& rec) {
+            for(string str : rec.strings) {
+                this->strings.push_back(str);
+            }
+            for(int num : rec.nums) {
+                this->nums.push_back(num);
+            }
+            for(float num : rec.floats) {
+                this->floats.push_back(num);
+            }
+            for(bool boolean : rec.booleans) {
+                this->booleans.push_back(boolean);
+            }
+        }
 
 };
 

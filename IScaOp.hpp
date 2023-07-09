@@ -3,18 +3,19 @@
 /*                                               */
 /*                                               */
 /*************************************************/
-#include "IAccessor.hpp"
-#include "IJob.hpp"
 #pragma once
 
+#include "IAccessor.hpp"
+#include "IJob.hpp"
+using namespace std;
 
+class IVariable;
 
-class IScalar : public IJob<IScalar,Record>{
+class IScalar : public IJob<IScalar, Record, vector<IVariable*>>{
     public:
         virtual Type getType() = 0;
         virtual Record Value() = 0;
-        virtual void Op() = 0;
-        
+        virtual void Op(vector<IVariable*> &variables) = 0;
 };
 
 class IVariable:public IScalar {
@@ -26,8 +27,7 @@ class IVariable:public IScalar {
 
 class IScaOp: public IScalar, public IOp {
     public:
-        //virtual Record op(IScalar& param1, IScalar& param2, std::vector<IVariable>& evalParams) = 0;
-        //virtual Record op(IScalar& param1, std::vector<IVariable>& evalParams) = 0;
+        virtual void Op(vector<IVariable*>& params) = 0;
 };
 
 class CConstVal: public IScalar, public R {
@@ -37,20 +37,36 @@ class CConstVal: public IScalar, public R {
     public:
         virtual Type getType() = 0;
         virtual Record Value() = 0;
-        virtual void Op() {};
+        virtual void Op(vector<IVariable*>& params) {};
 };
 
-class CVarVal: public IVariable {
+class CVarRef: public IVariable {
     string name;
     Type type;
-    Record value;
+    Record* value;
 
     public:
-        CVarVal(string name, Type type, Record val);
+        CVarRef(Type type, string name);
         string Name();
         Type getType();
         Record Value();
-        
+        void Op(vector<IVariable*>& params);
+        virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
+};
+
+class CVarRuntime: public IVariable {
+    string name;
+    Type type;
+    Record* value;
+
+    public:
+        CVarRuntime(Type type, string name, Record* value);
+        string Name();
+        Type getType();
+        Record Value();
+        void update(Record* value);
+        virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
+        virtual void Op(vector<IVariable*>& params){};
 };
 
 class IntValue: public Record, public CConstVal
@@ -68,9 +84,8 @@ class IntValue: public Record, public CConstVal
         virtual Type getType() {
             return Int;
         }
-        virtual vector<IJob<IScalar, Record>*>* getChildren() {
-            vector<IJob<IScalar, Record>*>* none = new vector<IJob<IScalar, Record>*>;
-            return none;
+        virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {
+            return nullptr;
         }
 };
 
@@ -89,9 +104,8 @@ class StringValue: public Record, public CConstVal
         virtual Type getType() {
             return String;
         }
-        virtual vector<IJob<IScalar, Record>*>* getChildren() {
-            vector<IJob<IScalar, Record>*>* none = new vector<IJob<IScalar, Record>*>;
-            return none;
+        virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {
+            return nullptr;
         }
 };
 
@@ -110,9 +124,8 @@ class FloatValue: public Record, public CConstVal
         virtual Type getType() {
             return Float;
         }
-        virtual vector<IJob<IScalar, Record>*>* getChildren() {
-            vector<IJob<IScalar, Record>*>* none = new vector<IJob<IScalar, Record>*>;
-            return none;
+        virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {
+            return nullptr;
         }
 };
 
@@ -131,9 +144,8 @@ class BoolValue: public Record, public CConstVal
         virtual Type getType() {
             return Boolean;
         }
-        virtual vector<IJob<IScalar, Record>*>* getChildren() {
-            vector<IJob<IScalar, Record>*>* none = new vector<IJob<IScalar, Record>*>;
-            return none;
+        virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {
+            return nullptr;
         }
 };
 

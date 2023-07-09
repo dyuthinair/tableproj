@@ -10,22 +10,29 @@
 
 using namespace std;
 
-//void testReadCsv();
-//void testWriteCsv();
-//void biggerTestWrite();
+void UnitTests(int argc, char* argv[]);
+void testReadCsv();
+void testWriteCsv();
+void biggerTestWrite();
 bool TestScaOpTree();
+void TestScaOpTreeWithParams();
 //bool TestBoolScaOpTree();
 
 int main(int argc, char* argv[])
 {
+    UnitTests(argc, argv);
+}
+
+void UnitTests(int argc, char* argv[])
+{
     //testReadCsv();
     //testWriteCsv();
     //biggerTestWrite();
-    std::cout << std::boolalpha << TestScaOpTree();
+    //std::cout << std::boolalpha << TestScaOpTree();
     //std::cout << std::boolalpha << TestBoolScaOpTree();
+    TestScaOpTreeWithParams();
 }
 
-/*
 void testReadCsv()
 {
     string filePath = "..\\testdata\\UserNames.csv";
@@ -63,15 +70,32 @@ void biggerTestWrite()
     CCSVSerializer *serializer = new CCSVSerializer();
     serializer->serialize(writeFilePath, table->getAccessor());
 }
-*/
+
 bool TestScaOpTree()
 {
-    ScaOpAdd *addNode = new ScaOpAdd(new IntValue(8), new IntValue(6));
+    ScaOpAdd *addNode = new ScaOpAdd(new ScaOpAdd(new IntValue(18), new IntValue(6)), new IntValue(5));
     //addNode->Op();
-    ScaOpEq *eqNode = new ScaOpEq(addNode, new IntValue(24));
-    JobEval<IScalar, Record>* tree = new JobEval<IScalar, Record>();
-    Record output = tree->evalTree(eqNode);
+    ScaOpEq *eqNode = new ScaOpEq(addNode, new IntValue(29));
+    JobEval<IScalar, Record, vector<IVariable*>>* tree = new JobEval<IScalar, Record, vector<IVariable*>>();
+    vector<IVariable*> params;
+    Record output = tree->evalTree(eqNode, params);
+
     return output.booleans.at(0);
+}
+
+void TestScaOpTreeWithParams()
+{
+    ScaOpAdd *addNode = new ScaOpAdd(new ScaOpAdd(new IntValue(18), new IntValue(6)), new CVarRef(Int, "x"));
+    //addNode->Op();
+    JobEval<IScalar, Record, vector<IVariable*>>* tree = new JobEval<IScalar, Record, vector<IVariable*>>();
+    vector<IVariable*> params;
+    Record output;
+    for(int i = 0; i < 10; i++) {
+        params.push_back(new CVarRuntime(Int, "x", new IntValue(i)));
+        output = tree->evalTree(addNode, params);
+        cout << output.nums.at(0) << "\n";
+        params.pop_back();
+    }
 }
 
 /*
@@ -82,4 +106,5 @@ bool TestBoolScaOpTree()
     auto truNode = new ScaOpAnd(new BoolValue(true), new BoolValue(true));
     truNode->Op();
     return flsNode->Value().booleans.at(0) == false && truNode->Value().booleans.at(0) == true;
-}*/
+}
+*/

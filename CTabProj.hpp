@@ -3,8 +3,10 @@
 /*                                               */
 /*                                               */
 /*************************************************/
-#include "ITabProj.hpp"
 #pragma once
+
+#include "ITabProj.hpp"
+
 
 class CTabProj : public ITabProj {
     ITable Op(ITable &tab1, vector<string> cols);

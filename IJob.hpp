@@ -3,17 +3,18 @@
 /*                                               */
 /*                                               */
 /*************************************************/
-#include <vector>
 #pragma once
+
+#include <vector>
 
 using namespace std;
 
-template<typename IOp, typename R>
+template<typename IOp, typename R, typename RuntimeVariables>
 class IJob {
     public:
-        virtual vector<IJob<IOp, R>*>* getChildren() = 0;
+        virtual vector<IJob<IOp, R, RuntimeVariables>*>* getChildren() = 0;
         virtual R Value() = 0;
-        virtual void Op() = 0;
+        virtual void Op(RuntimeVariables &variables) = 0;
 };
 
 class IOp {

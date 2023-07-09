@@ -28,15 +28,11 @@ cmemreader takes csv returns table
 -multithreading
 -pointer types
 - declaration of virtual functions returning pointer
-
+-- why vector of actual types cant be used instead of vector of basetypes
 
 tasks
 --
-    Move metadata vectors to CMemTable
-    add data vector to cmemtable
-    fix write amd read accessors for cmemtable
-    complete serializer using read accessor
-    update deserializer usimg write accessor
+
 
 
 Scalar operator
