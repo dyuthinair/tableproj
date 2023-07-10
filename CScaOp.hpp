@@ -40,6 +40,20 @@ class ScaOpAdd: public CScaOp
         vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren();
 };
 
+class ScaOpSub: public CScaOp
+{
+    IScalar *result;
+    IScalar *val1;
+    IScalar *val2;
+    
+    public:
+        ScaOpSub(IScalar *val1, IScalar *val2);
+        void Op(vector<IVariable*>& params);
+        Record Value();
+        Type getType();
+        vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren();
+};
+
 /*
 class ScaOpAnd: public CScaOp
 {

@@ -90,6 +90,60 @@ vector<IJob<IScalar, Record, vector<IVariable*>>*>* ScaOpAdd::getChildren() {
     return children;
 }
 
+ScaOpSub::ScaOpSub(IScalar *val1, IScalar *val2) 
+ : val1(val1), val2(val2)
+{
+    
+}
+
+void ScaOpSub::Op(vector<IVariable*>& params)
+{
+    ITracer::GetTracer()->Trace("ScaOpSub::Op called ");
+
+    if(val1->getType() == val2->getType()) {
+        switch(val1->getType()) {
+            case String: 
+                throw("Cannot subtract strings"); 
+                break;
+            case Int: 
+                this->result = new IntValue(val1->Value().nums.at(0) - val2->Value().nums.at(0));
+                ITracer::GetTracer()->Trace("ScaOpSub::Op result %d\n",  result->Value().nums.at(0));
+                break;
+            case Float: 
+                this->result = new FloatValue(val1->Value().floats.at(0) - val2->Value().floats.at(0));
+                ITracer::GetTracer()->Trace("ScaOpSub::Op result %f\n",  result->Value().floats.at(0));
+                break;
+            case Boolean: 
+                throw("Cannot subtract booleanas"); 
+                break;
+            case EnumCount:
+                throw("Not a real type");
+                break;
+        }
+    }  else {
+        throw("Type mismatch");
+    }
+}
+
+Record ScaOpSub::Value() {
+    return result->Value();
+}
+
+Type ScaOpSub::getType() {
+    if(val1->getType() == val2->getType()) {
+        return val1->getType();
+    } else {
+        throw("Type mismatch");
+    }
+}
+
+vector<IJob<IScalar, Record, vector<IVariable*>>*>* ScaOpSub::getChildren() {
+    vector<IJob*>* children = new vector<IJob*>();
+    children->push_back(val1);
+    children->push_back(val2);
+    return children;
+}
+
 /*
 
 ScaOpAnd::ScaOpAnd(IScalar *val1, IScalar *val2) 

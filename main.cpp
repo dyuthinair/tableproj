@@ -19,6 +19,7 @@ bool TestScaOpTree();
 void TestScaOpTreeWithParams();
 void projectTest();
 void project2Test();
+void subTest();
 //bool TestBoolScaOpTree();
 
 int main(int argc, char* argv[])
@@ -35,7 +36,8 @@ void UnitTests(int argc, char* argv[])
     //std::cout << std::boolalpha << TestBoolScaOpTree();
     //TestScaOpTreeWithParams();
     //projectTest();
-    project2Test();
+    //project2Test();
+    subTest();
 }
 
 void testReadCsv()
@@ -141,16 +143,50 @@ void project2Test()
 
     ScaOpAdd *addNode = new ScaOpAdd(new CVarRef(Float, "Age"), new FloatValue(1));
     ScaOpAdd *addNode2 = new ScaOpAdd(new CVarRef(Float, "Age"), new FloatValue(2));
+    CVarRef *nameNode = new CVarRef(String, "Name");
     CMemReadAccessor readAccessor = table->getAccessor();
     vector<string> colNames;
+    colNames.push_back("Name");
     colNames.push_back("Age + 1");
     colNames.push_back("Age + 2");
     vector<Type> colTypes;
+    colTypes.push_back(String);
     colTypes.push_back(Float);
     colTypes.push_back(Float);
     vector<IScalar*> trees;
+    trees.push_back(nameNode);
     trees.push_back(addNode);
     trees.push_back(addNode2);
+    CProject *projector = new CProject(readAccessor, colNames, colTypes, trees);
+    vector<IVariable*>* params = new vector<IVariable*>();
+    projector->Op(*params);
+
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(projector->Value()));
+}
+
+void subTest()
+{
+    string readFilePath = "..\\testdata\\mlb_players.csv";
+    string writeFilePath = "..\\testdata\\baseball_output_birthyear.csv";
+
+    CMemTable *table = new CMemTable();
+    CCSVDeserializer *deserializer = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessor = table->getWriteAccessor();
+    deserializer->deserialize(readFilePath, writeAccessor);
+
+    ScaOpSub *subNode = new ScaOpSub(new FloatValue(2023), new CVarRef(Float, "Age"));
+    CVarRef *nameNode = new CVarRef(String, "Name");
+    CMemReadAccessor readAccessor = table->getAccessor();
+    vector<string> colNames;
+    colNames.push_back("Name");
+    colNames.push_back("Birthyear");
+    vector<Type> colTypes;
+    colTypes.push_back(String);
+    colTypes.push_back(Float);
+    vector<IScalar*> trees;
+    trees.push_back(nameNode);
+    trees.push_back(subNode);
     CProject *projector = new CProject(readAccessor, colNames, colTypes, trees);
     vector<IVariable*>* params = new vector<IVariable*>();
     projector->Op(*params);
