@@ -32,7 +32,7 @@ void CVarRef::Op(vector<IVariable*>& params) {
             var->copy(curVar->Value());
             value = var;
 
-            ITracer::GetTracer()->Trace("CVarRef::Op value of %s is %d.\n", curVar->Name().c_str(), value->nums.at(0));
+            //ITracer::GetTracer()->Trace("CVarRef::Op value of %s is %d.\n", curVar->Name().c_str(), value->nums.at(0));
         }
     }
 }

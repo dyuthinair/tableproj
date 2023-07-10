@@ -7,6 +7,7 @@
 #include "CCSVSerializer.hpp"
 #include "CScaOp.hpp"
 #include "JobEval.hpp"
+#include "IRelOp.hpp"
 
 using namespace std;
 
@@ -16,6 +17,8 @@ void testWriteCsv();
 void biggerTestWrite();
 bool TestScaOpTree();
 void TestScaOpTreeWithParams();
+void projectTest();
+void project2Test();
 //bool TestBoolScaOpTree();
 
 int main(int argc, char* argv[])
@@ -30,7 +33,9 @@ void UnitTests(int argc, char* argv[])
     //biggerTestWrite();
     //std::cout << std::boolalpha << TestScaOpTree();
     //std::cout << std::boolalpha << TestBoolScaOpTree();
-    TestScaOpTreeWithParams();
+    //TestScaOpTreeWithParams();
+    //projectTest();
+    project2Test();
 }
 
 void testReadCsv()
@@ -96,6 +101,62 @@ void TestScaOpTreeWithParams()
         cout << output.nums.at(0) << "\n";
         params.pop_back();
     }
+}
+
+void projectTest()
+{
+    string readFilePath = "..\\testdata\\mlb_players.csv";
+    string writeFilePath = "..\\testdata\\baseball_output.csv";
+
+    CMemTable *table = new CMemTable();
+    CCSVDeserializer *deserializer = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessor = table->getWriteAccessor();
+    deserializer->deserialize(readFilePath, writeAccessor);
+
+    ScaOpAdd *addNode = new ScaOpAdd(new CVarRef(Float, "Age"), new FloatValue(1));
+    CMemReadAccessor readAccessor = table->getAccessor();
+    vector<string> colNames;
+    colNames.push_back("Age + 1");
+    vector<Type> colTypes;
+    colTypes.push_back(Float);
+    vector<IScalar*> trees;
+    trees.push_back(addNode);
+    CProject *projector = new CProject(readAccessor, colNames, colTypes, trees);
+    vector<IVariable*>* params = new vector<IVariable*>();
+    projector->Op(*params);
+
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(projector->Value()));
+}
+
+void project2Test()
+{
+    string readFilePath = "..\\testdata\\mlb_players.csv";
+    string writeFilePath = "..\\testdata\\baseball_output.csv";
+
+    CMemTable *table = new CMemTable();
+    CCSVDeserializer *deserializer = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessor = table->getWriteAccessor();
+    deserializer->deserialize(readFilePath, writeAccessor);
+
+    ScaOpAdd *addNode = new ScaOpAdd(new CVarRef(Float, "Age"), new FloatValue(1));
+    ScaOpAdd *addNode2 = new ScaOpAdd(new CVarRef(Float, "Age"), new FloatValue(2));
+    CMemReadAccessor readAccessor = table->getAccessor();
+    vector<string> colNames;
+    colNames.push_back("Age + 1");
+    colNames.push_back("Age + 2");
+    vector<Type> colTypes;
+    colTypes.push_back(Float);
+    colTypes.push_back(Float);
+    vector<IScalar*> trees;
+    trees.push_back(addNode);
+    trees.push_back(addNode2);
+    CProject *projector = new CProject(readAccessor, colNames, colTypes, trees);
+    vector<IVariable*>* params = new vector<IVariable*>();
+    projector->Op(*params);
+
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(projector->Value()));
 }
 
 /*

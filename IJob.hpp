@@ -17,10 +17,3 @@ class IJob {
         virtual void Op(RuntimeVariables &variables) = 0;
 };
 
-class IOp {
-
-};
-
-class R {
-
-};

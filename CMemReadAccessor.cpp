@@ -38,3 +38,4 @@ Record* CMemReadAccessor::getNextRecord() {
         return records->at(row-1);
     }
 }
+

@@ -25,12 +25,12 @@ class IVariable:public IScalar {
         virtual Record Value() = 0;
 };
 
-class IScaOp: public IScalar, public IOp {
+class IScaOp: public IScalar {
     public:
-        virtual void Op(vector<IVariable*>& params) = 0;
+
 };
 
-class CConstVal: public IScalar, public R {
+class CConstVal: public IScalar {
 
     Type type;
 

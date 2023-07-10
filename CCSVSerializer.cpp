@@ -27,33 +27,33 @@ void CCSVSerializer::serialize(string path, IAccessor &tableReader) {
     Record *record = tableReader.getNextRecord();
     while(record != nullptr) {
         string row = "";
-        vector<int> indeces (EnumCount, 0);
+        vector<int> indices (EnumCount, 0);
         for(int i = 0; i < tableReader.getCols(); i++) {
             Type type = tableReader.getColType(i);
             switch(type)
             {
                 case String: 
                 {
-                    row += record->strings.at(indeces[String]);
-                    indeces[String]++;
+                    row += record->strings.at(indices[String]);
+                    indices[String]++;
                     break;
                 }
                 case Int: 
                 {
-                    row += to_string(record->nums.at(indeces[Int]));
-                    indeces[Int]++;
+                    row += to_string(record->nums.at(indices[Int]));
+                    indices[Int]++;
                     break;
                 }
                 case Float: 
                 {
-                    row += to_string(record->floats.at(indeces[Float]));
-                    indeces[Float]++;
+                    row += to_string(record->floats.at(indices[Float]));
+                    indices[Float]++;
                     break;
                 }
                 case Boolean:
                 {
-                    bool val = record->booleans.at(indeces[Boolean]);
-                    indeces[Boolean]++;
+                    bool val = record->booleans.at(indices[Boolean]);
+                    indices[Boolean]++;
                     if(val == true) {
                         row +="True";
                     } else if(val == false) {

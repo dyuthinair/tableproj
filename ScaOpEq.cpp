@@ -44,7 +44,7 @@ ScaOpAdd::ScaOpAdd(IScalar *val1, IScalar *val2)
 
 void ScaOpAdd::Op(vector<IVariable*>& params)
 {
-    ITracer::GetTracer()->Trace("ScaOpAdd::Op called");
+    ITracer::GetTracer()->Trace("ScaOpAdd::Op called ");
 
     if(val1->getType() == val2->getType()) {
         switch(val1->getType()) {

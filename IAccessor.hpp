@@ -40,7 +40,7 @@ inline string toString(Type t)
     throw("Unreachable code");
 }
 
-class Record : public R
+class Record
 {
     public:
         std::vector<std::string> strings;

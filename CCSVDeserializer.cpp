@@ -7,6 +7,9 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <iomanip>
+#include <algorithm>
+
 
 using namespace std;
 
@@ -44,6 +47,7 @@ void CCSVDeserializer::deserialize(string path, IWriteAccessor &tableWriter) {
         {
             string substr;
             getline(iss, substr, ',');
+            substr.erase(remove(substr.begin(), substr.end(), '"'), substr.end());
             if (isFirstRow)
             {
                 for(std::string::iterator it=substr.begin(); it != substr.end(); it++)
