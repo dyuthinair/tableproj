@@ -23,7 +23,7 @@ class IVariable:public IScalar {
         virtual string Name() = 0;
         virtual Type getType() = 0;
         virtual Record Value() = 0;
-        void Update(Record* value) {};
+        void Update(Record* value) ;
 };
 
 class IScaOp: public IScalar {

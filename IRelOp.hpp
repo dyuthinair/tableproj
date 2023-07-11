@@ -18,6 +18,12 @@ class IProject : public IRelOp {
         IProject(IAccessor& table, vector<string> colNames, vector<Type> colTypes, vector<IScalar*> trees){};
 };
 
+class ISelect : public IRelOp {
+    public: 
+        ISelect() {};
+        ISelect(IAccessor& table, vector<string> colNames, vector<Type> colTypes, vector<IScalar*> trees){};
+};
+
 class CProject : public IProject {
 
     IAccessor& inputAccessor;
@@ -28,6 +34,19 @@ class CProject : public IProject {
 
     public:
         CProject(IAccessor& inputAccessor, vector<string> colNames, vector<Type> colTypes, vector<IScalar*> trees);
+        virtual vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* getChildren() {return nullptr;};
+        virtual void Op(vector<IVariable*>& params);
+        virtual IAccessor* Value();
+};
+
+class CSelect : public ISelect {
+
+    IAccessor& inputAccessor;
+    vector<IScalar*> trees;
+    IAccessor* outputAccessor;
+
+    public:
+        CSelect(IAccessor& inputAccessor, vector<IScalar*> trees);
         virtual vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* getChildren() {return nullptr;};
         virtual void Op(vector<IVariable*>& params);
         virtual IAccessor* Value();

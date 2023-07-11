@@ -20,6 +20,7 @@ void TestScaOpTreeWithParams();
 void projectTest();
 void project2Test();
 void subTest();
+void selectTest();
 //bool TestBoolScaOpTree();
 
 int main(int argc, char* argv[])
@@ -36,8 +37,9 @@ void UnitTests(int argc, char* argv[])
     //std::cout << std::boolalpha << TestBoolScaOpTree();
     //TestScaOpTreeWithParams();
     //projectTest();
-    project2Test();
+    //project2Test();
     //subTest();
+    selectTest();
 }
 
 void testReadCsv()
@@ -188,6 +190,29 @@ void subTest()
     trees.push_back(nameNode);
     trees.push_back(subNode);
     CProject *projector = new CProject(readAccessor, colNames, colTypes, trees);
+    vector<IVariable*>* params = new vector<IVariable*>();
+    projector->Op(*params);
+
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(projector->Value()));
+}
+
+
+void selectTest()
+{
+    string readFilePath = "..\\testdata\\mlb_players.csv";
+    string writeFilePath = "..\\testdata\\baseball_output_donachie.csv";
+
+    CMemTable *table = new CMemTable();
+    CCSVDeserializer *deserializer = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessor = table->getWriteAccessor();
+    deserializer->deserialize(readFilePath, writeAccessor);
+
+    ScaOpEq *eqNode = new ScaOpEq(new CVarRef(Float, "Age"), new FloatValue(22.990000));
+    CMemReadAccessor readAccessor = table->getAccessor();
+    vector<IScalar*> trees;
+    trees.push_back(eqNode);
+    CSelect *projector = new CSelect(readAccessor, trees);
     vector<IVariable*>* params = new vector<IVariable*>();
     projector->Op(*params);
 
