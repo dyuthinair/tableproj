@@ -70,6 +70,20 @@ class Record
             }
         }
 
+        void clear() {
+            while(!strings.empty()) {
+                strings.pop_back();
+            }
+            while(!nums.empty()) {
+                nums.pop_back();
+            }
+            while(!floats.empty()) {
+                floats.pop_back();
+            }
+            while(!booleans.empty()) {
+                booleans.pop_back();
+            }
+        }
 };
 
 class IAccessor

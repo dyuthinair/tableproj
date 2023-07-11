@@ -1,0 +1,25 @@
+/*************************************************/
+/*   (C) 2023 Dyuthi Nair                        */
+/*                                               */
+/*                                               */
+/*************************************************/
+#pragma once
+
+#include "IScaOp.hpp"
+
+using namespace std;
+
+class CVarRuntimeUsingRecord: public CVarRuntime {
+    string name;
+    Type type;
+    Record* prow;
+    Record returnValue;
+    int col;
+
+    public:
+        CVarRuntimeUsingRecord(Type type, string name, int column);
+        virtual Record Value();
+        virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
+        virtual void Op(vector<IVariable*>& params){};
+        void Update(Record* pRow);
+};

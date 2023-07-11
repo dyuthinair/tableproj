@@ -23,6 +23,7 @@ class IVariable:public IScalar {
         virtual string Name() = 0;
         virtual Type getType() = 0;
         virtual Record Value() = 0;
+        void Update(Record* value) {};
 };
 
 class IScaOp: public IScalar {
@@ -30,7 +31,7 @@ class IScaOp: public IScalar {
 
 };
 
-class CConstVal: public IScalar {
+class CConstVal: public IScalar, public Record {
 
     Type type;
 
@@ -38,6 +39,7 @@ class CConstVal: public IScalar {
         virtual Type getType() = 0;
         virtual Record Value() = 0;
         virtual void Op(vector<IVariable*>& params) {};
+        virtual void update(Record* value) {};
 };
 
 class CVarRef: public IVariable {
@@ -69,7 +71,7 @@ class CVarRuntime: public IVariable {
         virtual void Op(vector<IVariable*>& params){};
 };
 
-class IntValue: public Record, public CConstVal
+class IntValue: public CConstVal
 {
     public:
         IntValue(){};
@@ -87,9 +89,13 @@ class IntValue: public Record, public CConstVal
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {
             return nullptr;
         }
+        virtual void update(int value) {
+            nums.pop_back();
+            nums.push_back(value);
+        }
 };
 
-class StringValue: public Record, public CConstVal
+class StringValue: public CConstVal
 {
     public:
         StringValue(){};
@@ -107,9 +113,13 @@ class StringValue: public Record, public CConstVal
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {
             return nullptr;
         }
+        virtual void update(string value) {
+            strings.pop_back();
+            strings.push_back(value);
+        }
 };
 
-class FloatValue: public Record, public CConstVal
+class FloatValue: public CConstVal
 {
     public:
         FloatValue(){};
@@ -127,9 +137,13 @@ class FloatValue: public Record, public CConstVal
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {
             return nullptr;
         }
+        virtual void update(float value) {
+            floats.pop_back();
+            floats.push_back(value);
+        }
 };
 
-class BoolValue: public Record, public CConstVal
+class BoolValue: public CConstVal
 {
     public:
         BoolValue(){};
@@ -146,6 +160,10 @@ class BoolValue: public Record, public CConstVal
         }
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {
             return nullptr;
+        }
+        virtual void update(bool value) {
+            booleans.pop_back();
+            booleans.push_back(value);
         }
 };
 

@@ -36,8 +36,8 @@ void UnitTests(int argc, char* argv[])
     //std::cout << std::boolalpha << TestBoolScaOpTree();
     //TestScaOpTreeWithParams();
     //projectTest();
-    //project2Test();
-    subTest();
+    project2Test();
+    //subTest();
 }
 
 void testReadCsv()
