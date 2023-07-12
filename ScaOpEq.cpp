@@ -208,7 +208,7 @@ ScaOpLt::ScaOpLt(IScalar *val1, IScalar *val2)
 
 void ScaOpLt::Op(vector<IVariable*>& params)
 {
-    ITracer::GetTracer()->Trace("ScaOpGt::Op called \n");
+    ITracer::GetTracer()->Trace("ScaOpLt::Op called \n");
     bool result;
 
     if(val1->getType() == val2->getType()) {
@@ -219,11 +219,11 @@ void ScaOpLt::Op(vector<IVariable*>& params)
             case Int: 
                 result = val1->Value().nums.at(0) < val2->Value().nums.at(0);
                 this->eval = BoolValue(result);
-                ITracer::GetTracer()->Trace("ScaOpGt::Op result: %d > %d is %s\n", val1->Value().nums.at(0), val2->Value().nums.at(0), result ? "true" : "false");
+                ITracer::GetTracer()->Trace("ScaOpLt::Op result: %d > %d is %s\n", val1->Value().nums.at(0), val2->Value().nums.at(0), result ? "true" : "false");
                 break;
             case Float: 
                 this->eval = BoolValue(val1->Value().floats.at(0) < val2->Value().floats.at(0));
-                ITracer::GetTracer()->Trace("ScaOpGt::Op result %s\n",  eval.Value().booleans.at(0) ? "true" : "false");
+                ITracer::GetTracer()->Trace("ScaOpLt::Op result %s\n",  eval.Value().booleans.at(0) ? "true" : "false");
                 break;
             case Boolean: 
                 throw("Cannot compare booleanas"); 
@@ -253,6 +253,39 @@ vector<IJob<IScalar, Record, vector<IVariable*>>*>* ScaOpLt::getChildren() {
     vector<IJob*>* children = new vector<IJob*>();
     children->push_back(val1);
     children->push_back(val2);
+    return children;
+}
+
+ScaOpFtoI::ScaOpFtoI(IScalar *val1) 
+ : val1(val1)
+{
+    
+}
+
+void ScaOpFtoI::Op(vector<IVariable*>& params)
+{
+    ITracer::GetTracer()->Trace("ScaOpFtoI::Op called \n");
+
+    if(val1->getType() != Float) {
+        throw("Cannot call convert float to int without a float");
+    }  else {
+        int num = static_cast<int>(val1->Value().floats.at(0));
+        eval = IntValue(num);
+        ITracer::GetTracer()->Trace("ScaOpFtoI::Op converted %f to %d \n", val1->Value().floats.at(0), num);
+    }
+}
+
+Record ScaOpFtoI::Value() {
+    return eval.Value();
+}
+
+Type ScaOpFtoI::getType() {
+    return Int;
+}
+
+vector<IJob<IScalar, Record, vector<IVariable*>>*>* ScaOpFtoI::getChildren() {
+    vector<IJob*>* children = new vector<IJob*>();
+    children->push_back(val1);
     return children;
 }
 

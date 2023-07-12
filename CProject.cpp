@@ -70,18 +70,21 @@ void CProject::Op(vector<IVariable*>& params) {
             Record curEval = evaluator->evalTree(tree, varParams);
             if(!curEval.strings.empty()) {
                 output->strings.push_back(curEval.strings.at(0));
+                ITracer::GetTracer()->Trace("String added: %s\n", curEval.strings.at(0));
             } else if(!curEval.nums.empty()) {
                 output->nums.push_back(curEval.nums.at(0));
+                ITracer::GetTracer()->Trace("Int added: %d\n", curEval.nums.at(0));
             } else if(!curEval.floats.empty()) {
                 output->floats.push_back(curEval.floats.at(0));
+                ITracer::GetTracer()->Trace("Float added: %f\n", curEval.floats.at(0));
             } else if(!curEval.booleans.empty()) {
                 output->booleans.push_back(curEval.booleans.at(0));
+                ITracer::GetTracer()->Trace("Boolean added: %s\n", curEval.booleans.at(0) ? "true" : "false");
             } else {
                 throw ("Scalar evaluation not done properly");
             }
         }
         writeAccessor.pushRow(output);
-        ITracer::GetTracer()->Trace("Record done, %f added\n", output->floats.at(0));
     }
     
     this->outputAccessor = &outputTable->getAccessor();
@@ -90,3 +93,4 @@ void CProject::Op(vector<IVariable*>& params) {
 IAccessor* CProject::Value() {
     return outputAccessor;
 }
+

@@ -22,6 +22,7 @@ void project2Test();
 void subTest();
 void selectTest();
 bool TestGt();
+void ftoiTest();
 //bool TestBoolScaOpTree();
 
 int main(int argc, char* argv[])
@@ -40,7 +41,8 @@ void UnitTests(int argc, char* argv[])
     //project2Test();
     //subTest();
     //selectTest();
-    std::cout << std::boolalpha << TestGt();
+    //std::cout << std::boolalpha << TestGt();
+    ftoiTest();
     //std::cout << std::boolalpha << TestBoolScaOpTree();
 }
 
@@ -208,10 +210,10 @@ void selectTest()
     CMemWriteAccessor writeAccessor = table->getWriteAccessor();
     deserializer->deserialize(readFilePath, writeAccessor);
 
-    ScaOpEq *eqNode = new ScaOpEq(new CVarRef(Float, "Age"), new FloatValue(22.990000));
+    ScaOpGt *gtNode = new ScaOpGt(new CVarRef(Float, "Age"), new FloatValue(25));
     CMemReadAccessor readAccessor = table->getAccessor();
     vector<IScalar*> trees;
-    trees.push_back(eqNode);
+    trees.push_back(gtNode);
     CSelect *projector = new CSelect(readAccessor, trees);
     vector<IVariable*>* params = new vector<IVariable*>();
     projector->Op(*params);
@@ -230,6 +232,37 @@ bool TestGt()
     Record output = tree->evalTree(gtNode, params);
 
     return output.booleans.at(0);
+}
+
+void ftoiTest()
+{
+    string readFilePath = "..\\testdata\\mlb_players.csv";
+    string writeFilePath = "..\\testdata\\baseball_output_birthyear.csv";
+
+    CMemTable *table = new CMemTable();
+    CCSVDeserializer *deserializer = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessor = table->getWriteAccessor();
+    deserializer->deserialize(readFilePath, writeAccessor);
+
+    ScaOpSub *subNode = new ScaOpSub(new FloatValue(2023), new CVarRef(Float, "Age"));
+    ScaOpFtoI *ftoi = new ScaOpFtoI(subNode);
+    CVarRef *nameNode = new CVarRef(String, "Name");
+    CMemReadAccessor readAccessor = table->getAccessor();
+    vector<string> colNames;
+    colNames.push_back("Name");
+    colNames.push_back("Birthyear");
+    vector<Type> colTypes;
+    colTypes.push_back(String);
+    colTypes.push_back(Int);
+    vector<IScalar*> trees;
+    trees.push_back(nameNode);
+    trees.push_back(ftoi);
+    CProject *projector = new CProject(readAccessor, colNames, colTypes, trees);
+    vector<IVariable*>* params = new vector<IVariable*>();
+    projector->Op(*params);
+
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(projector->Value()));
 }
 
 /*
