@@ -1,5 +1,6 @@
 #include  "JobEval.hpp"
 #include "IScaOp.hpp"
+#include "IRelOp.hpp"
 #include <vector>
 
 using namespace std;
@@ -41,3 +42,5 @@ R JobEval<IOp, R, Runtime>::evalTree(IJob<IOp, R, Runtime> *root,Runtime& params
 }
 
 template class JobEval<IScalar, Record, vector<IVariable*>>;
+template class JobEval<IRelOp, IAccessor*, vector<IVariable*>>;
+

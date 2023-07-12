@@ -8,14 +8,20 @@
 #include "CMemTable.hpp"
 #include "CVarRuntimeUsingRecord.hpp"
 
-CSelect::CSelect(IAccessor& inputAccessor, vector<IScalar*> trees) 
-                    : inputAccessor(inputAccessor) {
-    this->trees = trees;
+CSelect::CSelect(IRelOp& child, IScalar* tree) 
+{
+    this->children.push_back(&child);
+    this->childJobs.assign(children.begin(), children.end());
+    this->tree = tree;
     outputAccessor = nullptr;
 }
 
 
 void CSelect::Op(vector<IVariable*>& params) {
+
+    ITracer::GetTracer()->Trace("CSelect::Op Called\n");
+
+    IAccessor& inputAccessor = *children.at(0)->Value();
     CMemTable *outputTable = new CMemTable();
     IWriteAccessor& writeAccessor = outputTable->getWriteAccessor();
     vector<string> colNames;
@@ -66,19 +72,12 @@ void CSelect::Op(vector<IVariable*>& params) {
         }
         vector<IVariable*> varParams;
         varParams.assign(runtimeParams.begin(), runtimeParams.end());
-        bool toKeep = true;
         JobEval<IScalar, Record, vector<IVariable*>>* evaluator = new JobEval<IScalar, Record, vector<IVariable*>>();
-        for(IScalar* tree : trees) {
-            Record curEval = evaluator->evalTree(tree, varParams);
-            if(curEval.booleans.empty()) {
-                throw("Input to select should be a boolean value");
-            } else {
-                if(curEval.booleans.at(0) == false) {
-                    toKeep = false;
-                } 
-            }
-        }
-        if(toKeep) {
+        Record curEval = evaluator->evalTree(tree, varParams);
+        if(curEval.booleans.empty()) {
+            throw("Input to select should be a boolean value");
+        } 
+        if(curEval.booleans.at(0)) {
             Record* newRecord = new Record();
             newRecord->copy(*curRecord);
             writeAccessor.pushRow(newRecord);
@@ -91,4 +90,10 @@ void CSelect::Op(vector<IVariable*>& params) {
 
 IAccessor* CSelect::Value() {
     return outputAccessor;
+}
+
+vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* CSelect::getChildren() {
+    ITracer::GetTracer()->Trace("CSelect::getChildren Called\n");
+
+    return &childJobs;
 }

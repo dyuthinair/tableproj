@@ -23,6 +23,8 @@ void subTest();
 void selectTest();
 bool TestGt();
 void ftoiTest();
+void selectThenProject();
+
 //bool TestBoolScaOpTree();
 
 int main(int argc, char* argv[])
@@ -42,7 +44,9 @@ void UnitTests(int argc, char* argv[])
     //subTest();
     //selectTest();
     //std::cout << std::boolalpha << TestGt();
-    ftoiTest();
+    //ftoiTest();
+    selectThenProject();
+
     //std::cout << std::boolalpha << TestBoolScaOpTree();
 }
 
@@ -127,12 +131,11 @@ void projectTest()
     colTypes.push_back(Float);
     vector<IScalar*> trees;
     trees.push_back(addNode);
-    CProject *projector = new CProject(readAccessor, colNames, colTypes, trees);
-    vector<IVariable*>* params = new vector<IVariable*>();
-    projector->Op(*params);
-
+    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees);
+    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(projector->Value()));
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
 }
 
 void project2Test()
@@ -161,12 +164,11 @@ void project2Test()
     trees.push_back(nameNode);
     trees.push_back(addNode);
     trees.push_back(addNode2);
-    CProject *projector = new CProject(readAccessor, colNames, colTypes, trees);
-    vector<IVariable*>* params = new vector<IVariable*>();
-    projector->Op(*params);
-
+    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees);
+    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(projector->Value()));
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
 }
 
 void subTest()
@@ -191,12 +193,11 @@ void subTest()
     vector<IScalar*> trees;
     trees.push_back(nameNode);
     trees.push_back(subNode);
-    CProject *projector = new CProject(readAccessor, colNames, colTypes, trees);
-    vector<IVariable*>* params = new vector<IVariable*>();
-    projector->Op(*params);
-
+    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees);
+    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(projector->Value()));
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
 }
 
 
@@ -212,14 +213,11 @@ void selectTest()
 
     ScaOpGt *gtNode = new ScaOpGt(new CVarRef(Float, "Age"), new FloatValue(25));
     CMemReadAccessor readAccessor = table->getAccessor();
-    vector<IScalar*> trees;
-    trees.push_back(gtNode);
-    CSelect *projector = new CSelect(readAccessor, trees);
-    vector<IVariable*>* params = new vector<IVariable*>();
-    projector->Op(*params);
-
+    CSelect *selecter = new CSelect(*new AccessorRelOp(readAccessor), gtNode);
+    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(projector->Value()));
+    serializer->serialize(writeFilePath, *(tree->evalTree(selecter, params)));
 }
 
 bool TestGt()
@@ -257,12 +255,45 @@ void ftoiTest()
     vector<IScalar*> trees;
     trees.push_back(nameNode);
     trees.push_back(ftoi);
-    CProject *projector = new CProject(readAccessor, colNames, colTypes, trees);
-    vector<IVariable*>* params = new vector<IVariable*>();
-    projector->Op(*params);
-
+    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees);
+    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(projector->Value()));
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
+}
+
+void selectThenProject() {
+    string readFilePath = "..\\testdata\\mlb_players.csv";
+    string writeFilePath = "..\\testdata\\baseball_output_birth_1900s.csv";
+
+    CMemTable *table = new CMemTable();
+    CCSVDeserializer *deserializer = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessor = table->getWriteAccessor();
+    deserializer->deserialize(readFilePath, writeAccessor);
+
+    IScaOp *gtNode = new ScaOpEq(new ScaOpFtoI(new CVarRef(Float, "Age")), new IntValue(24));
+    CMemReadAccessor readAccessor = table->getAccessor();
+    AccessorRelOp* accessorRelOp = new AccessorRelOp(readAccessor);
+    CSelect *selecter = new CSelect(*accessorRelOp, gtNode);
+
+    ScaOpSub *subNode = new ScaOpSub(new FloatValue(2023), new CVarRef(Float, "Age"));
+    ScaOpFtoI *ftoi = new ScaOpFtoI(subNode);
+    CVarRef *nameNode = new CVarRef(String, "Name");
+    vector<string> colNames;
+    colNames.push_back("Name");
+    colNames.push_back("Birthyear");
+    vector<Type> colTypes;
+    colTypes.push_back(String);
+    colTypes.push_back(Int);
+    vector<IScalar*> trees;
+    trees.push_back(nameNode);
+    trees.push_back(ftoi);
+    CProject *projector = new CProject(*selecter, colNames, colTypes, trees);
+
+    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    vector<IVariable*> params;
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
 }
 
 /*

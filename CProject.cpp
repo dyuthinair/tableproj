@@ -8,9 +8,10 @@
 #include "CMemTable.hpp"
 #include "CVarRuntimeUsingRecord.hpp"
 
-CProject::CProject(IAccessor& inputAccessor, vector<string> colNames, vector<Type> colTypes, 
-                    vector<IScalar*> trees) 
-                    : inputAccessor(inputAccessor) {
+CProject::CProject(IRelOp& child, vector<string> colNames, vector<Type> colTypes, 
+                    vector<IScalar*> trees) {
+    this->children.push_back(&child);
+    this->childJobs.assign(children.begin(), children.end());
     this->colNames = colNames;
     this->colTypes = colTypes;
     this->trees = trees;
@@ -19,6 +20,9 @@ CProject::CProject(IAccessor& inputAccessor, vector<string> colNames, vector<Typ
 
 
 void CProject::Op(vector<IVariable*>& params) {
+    ITracer::GetTracer()->Trace("CProject::Op Called\n");
+
+    IAccessor& inputAccessor = *children.at(0)->Value();
     CMemTable *outputTable = new CMemTable();
     IWriteAccessor& writeAccessor = outputTable->getWriteAccessor();
     writeAccessor.setColNames(colNames);
@@ -70,7 +74,7 @@ void CProject::Op(vector<IVariable*>& params) {
             Record curEval = evaluator->evalTree(tree, varParams);
             if(!curEval.strings.empty()) {
                 output->strings.push_back(curEval.strings.at(0));
-                ITracer::GetTracer()->Trace("String added: %s\n", curEval.strings.at(0));
+                ITracer::GetTracer()->Trace("String added: %s\n", curEval.strings.at(0).c_str());
             } else if(!curEval.nums.empty()) {
                 output->nums.push_back(curEval.nums.at(0));
                 ITracer::GetTracer()->Trace("Int added: %d\n", curEval.nums.at(0));
@@ -94,3 +98,8 @@ IAccessor* CProject::Value() {
     return outputAccessor;
 }
 
+vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* CProject::getChildren() {
+    ITracer::GetTracer()->Trace("CProject::getChildren Called\n");
+
+    return &childJobs;
+}

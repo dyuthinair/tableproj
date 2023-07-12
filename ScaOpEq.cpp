@@ -14,7 +14,33 @@ ScaOpEq::ScaOpEq(IScalar *val1, IScalar *val2)
 }
 
 void ScaOpEq::Op(vector<IVariable*>& params) {
-    this->eval = BoolValue(val1->Value() == val2->Value());
+    ITracer::GetTracer()->Trace("ScaOpEq::Op called \n");
+    bool result;
+
+    if(val1->getType() == val2->getType()) {
+        switch(val1->getType()) {
+            case String: 
+                throw("Cannot compare strings"); 
+                break;
+            case Int: 
+                result = val1->Value().nums.at(0) == val2->Value().nums.at(0);
+                this->eval = BoolValue(result);
+                ITracer::GetTracer()->Trace("ScaOpEq::Op result: %d > %d is %s\n", val1->Value().nums.at(0), val2->Value().nums.at(0), result ? "true" : "false");
+                break;
+            case Float: 
+                this->eval = BoolValue(val1->Value().floats.at(0) == val2->Value().floats.at(0));
+                ITracer::GetTracer()->Trace("ScaOpEq::Op result %s\n",  eval.Value().booleans.at(0) ? "true" : "false");
+                break;
+            case Boolean: 
+                throw("Cannot compare booleanas"); 
+                break;
+            case EnumCount:
+                throw("Not a real type");
+                break;
+        }
+    }  else {
+        throw("Type mismatch");
+    }
 }
 
 Record ScaOpEq::Value() {

@@ -9,45 +9,53 @@
 #include "JobEval.hpp"
 #include "IScaOp.hpp"
 
+// IJob<IRelOp, IAccessor*, std::vector<IVariable*> >
 class IRelOp : public IJob<IRelOp, IAccessor*, vector<IVariable*>> {
 };
 
+class IAccessorRelOp : public IRelOp {
+};
+
 class IProject : public IRelOp {
-    public: 
-        IProject() {};
-        IProject(IAccessor& table, vector<string> colNames, vector<Type> colTypes, vector<IScalar*> trees){};
 };
 
 class ISelect : public IRelOp {
-    public: 
-        ISelect() {};
-        ISelect(IAccessor& table, vector<string> colNames, vector<Type> colTypes, vector<IScalar*> trees){};
+};
+
+class AccessorRelOp: public IAccessorRelOp
+{
+    IAccessor& table;
+    public:
+        AccessorRelOp(IAccessor& table);
+        virtual vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* getChildren();
+        virtual void Op(vector<IVariable*>& params);
+        virtual IAccessor* Value();
 };
 
 class CProject : public IProject {
-
-    IAccessor& inputAccessor;
+    vector<IRelOp*> children;
+    vector<IJob<IRelOp, IAccessor*, std::vector<IVariable*>>*> childJobs;
     vector<string> colNames;
     vector<Type> colTypes;
     vector<IScalar*> trees;
     IAccessor* outputAccessor;
 
     public:
-        CProject(IAccessor& inputAccessor, vector<string> colNames, vector<Type> colTypes, vector<IScalar*> trees);
-        virtual vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* getChildren() {return nullptr;};
+        CProject(IRelOp& child, vector<string> colNames, vector<Type> colTypes, vector<IScalar*> trees);
+        virtual vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* getChildren();
         virtual void Op(vector<IVariable*>& params);
         virtual IAccessor* Value();
 };
 
 class CSelect : public ISelect {
-
-    IAccessor& inputAccessor;
-    vector<IScalar*> trees;
+    vector<IRelOp*> children;
+    vector<IJob<IRelOp, IAccessor*, std::vector<IVariable*>>*> childJobs;
+    IScalar* tree;
     IAccessor* outputAccessor;
 
     public:
-        CSelect(IAccessor& inputAccessor, vector<IScalar*> trees);
-        virtual vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* getChildren() {return nullptr;};
+        CSelect(IRelOp& child, IScalar* tree);
+        virtual vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* getChildren();
         virtual void Op(vector<IVariable*>& params);
         virtual IAccessor* Value();
 };

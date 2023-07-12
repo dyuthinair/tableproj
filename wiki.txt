@@ -34,41 +34,25 @@ tasks
 --
 
 
-
 Scalar operator
--- IScaOp 
-    Record Op(Record param1, Record param2, int col1, int col2)
-
-ScaOpEq
-    Eq
-    Gt
-    Lt
-    And
-    Or
-    Not
+    Cast given Scalar and a type
+    Count
 
 
-IExpression
-    Apply(IScaOp)
-
---- table operators
-ITabOp
-    ITable Op(ITable)
 
 ITabJoin
     -2 tables and a column name
-ITabSel
-    -1 table and a scalar operator
-ITabProj
-    -1 table and a vector of columns
-
 CNestedLoopJoin
 CMerjeJoin
 CHashJoin
 
-CFilter
+ISortRelOp
+IAggRelOp
 
-CProject
+
+
+
+
 
 
 
