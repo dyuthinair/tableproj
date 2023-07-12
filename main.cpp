@@ -21,6 +21,7 @@ void projectTest();
 void project2Test();
 void subTest();
 void selectTest();
+bool TestGt();
 //bool TestBoolScaOpTree();
 
 int main(int argc, char* argv[])
@@ -34,12 +35,13 @@ void UnitTests(int argc, char* argv[])
     //testWriteCsv();
     //biggerTestWrite();
     //std::cout << std::boolalpha << TestScaOpTree();
-    //std::cout << std::boolalpha << TestBoolScaOpTree();
     //TestScaOpTreeWithParams();
     //projectTest();
     //project2Test();
     //subTest();
-    selectTest();
+    //selectTest();
+    std::cout << std::boolalpha << TestGt();
+    //std::cout << std::boolalpha << TestBoolScaOpTree();
 }
 
 void testReadCsv()
@@ -83,7 +85,6 @@ void biggerTestWrite()
 bool TestScaOpTree()
 {
     ScaOpAdd *addNode = new ScaOpAdd(new ScaOpAdd(new IntValue(18), new IntValue(6)), new IntValue(5));
-    //addNode->Op();
     ScaOpEq *eqNode = new ScaOpEq(addNode, new IntValue(29));
     JobEval<IScalar, Record, vector<IVariable*>>* tree = new JobEval<IScalar, Record, vector<IVariable*>>();
     vector<IVariable*> params;
@@ -95,7 +96,6 @@ bool TestScaOpTree()
 void TestScaOpTreeWithParams()
 {
     ScaOpAdd *addNode = new ScaOpAdd(new ScaOpAdd(new IntValue(18), new IntValue(6)), new CVarRef(Int, "x"));
-    //addNode->Op();
     JobEval<IScalar, Record, vector<IVariable*>>* tree = new JobEval<IScalar, Record, vector<IVariable*>>();
     vector<IVariable*> params;
     Record output;
@@ -218,6 +218,18 @@ void selectTest()
 
     CCSVSerializer *serializer = new CCSVSerializer();
     serializer->serialize(writeFilePath, *(projector->Value()));
+}
+
+bool TestGt()
+{
+    ScaOpAdd *addNode = new ScaOpAdd(new ScaOpAdd(new IntValue(19), new IntValue(6)), new IntValue(5));
+    //addNode->Op();
+    ScaOpGt *gtNode = new ScaOpGt(addNode, new IntValue(29));
+    JobEval<IScalar, Record, vector<IVariable*>>* tree = new JobEval<IScalar, Record, vector<IVariable*>>();
+    vector<IVariable*> params;
+    Record output = tree->evalTree(gtNode, params);
+
+    return output.booleans.at(0);
 }
 
 /*
