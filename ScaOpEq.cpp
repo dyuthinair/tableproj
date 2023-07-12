@@ -200,6 +200,62 @@ vector<IJob<IScalar, Record, vector<IVariable*>>*>* ScaOpGt::getChildren() {
     return children;
 }
 
+ScaOpLt::ScaOpLt(IScalar *val1, IScalar *val2) 
+ : val1(val1), val2(val2)
+{
+    
+}
+
+void ScaOpLt::Op(vector<IVariable*>& params)
+{
+    ITracer::GetTracer()->Trace("ScaOpGt::Op called \n");
+    bool result;
+
+    if(val1->getType() == val2->getType()) {
+        switch(val1->getType()) {
+            case String: 
+                throw("Cannot compare strings"); 
+                break;
+            case Int: 
+                result = val1->Value().nums.at(0) < val2->Value().nums.at(0);
+                this->eval = BoolValue(result);
+                ITracer::GetTracer()->Trace("ScaOpGt::Op result: %d > %d is %s\n", val1->Value().nums.at(0), val2->Value().nums.at(0), result ? "true" : "false");
+                break;
+            case Float: 
+                this->eval = BoolValue(val1->Value().floats.at(0) < val2->Value().floats.at(0));
+                ITracer::GetTracer()->Trace("ScaOpGt::Op result %s\n",  eval.Value().booleans.at(0) ? "true" : "false");
+                break;
+            case Boolean: 
+                throw("Cannot compare booleanas"); 
+                break;
+            case EnumCount:
+                throw("Not a real type");
+                break;
+        }
+    }  else {
+        throw("Type mismatch");
+    }
+}
+
+Record ScaOpLt::Value() {
+    return eval.Value();
+}
+
+Type ScaOpLt::getType() {
+    if(val1->getType() == val2->getType()) {
+        return val1->getType();
+    } else {
+        throw("Type mismatch");
+    }
+}
+
+vector<IJob<IScalar, Record, vector<IVariable*>>*>* ScaOpLt::getChildren() {
+    vector<IJob*>* children = new vector<IJob*>();
+    children->push_back(val1);
+    children->push_back(val2);
+    return children;
+}
+
 /*
 
 ScaOpAnd::ScaOpAnd(IScalar *val1, IScalar *val2) 
