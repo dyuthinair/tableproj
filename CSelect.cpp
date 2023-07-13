@@ -29,7 +29,7 @@ void CSelect::Op(vector<IVariable*>& params) {
     
     vector<CVarRuntimeUsingRecord*> runtimeParams;
     vector<int> indices (EnumCount, 0);
-    for(int i = 0; i < inputAccessor.getCols(); i++) {
+    for(unsigned int i = 0; i < inputAccessor.getCols(); i++) {
         Type curType = inputAccessor.getColType(i);
         string colName = inputAccessor.getColName(i);
 

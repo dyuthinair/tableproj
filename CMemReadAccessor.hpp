@@ -9,6 +9,7 @@
 
 class CMemReadAccessor : public IAccessor {
 
+    string tableName;
     vector<string> *colNames;
     vector<Type> *colTypes;
     vector<Record*> *records;
@@ -16,11 +17,12 @@ class CMemReadAccessor : public IAccessor {
     unsigned int row;
 
     public:
-        CMemReadAccessor(std::vector<string> *colNames, 
+        CMemReadAccessor(string tableName, std::vector<string> *colNames, 
             std::vector<Type> *colTypes, 
             std::vector<Record*> *records);
-        int getCols();
+        unsigned int getCols();
         Type getColType(int col);
         string getColName(int col);
         Record* getNextRecord();
+        string getName();
 };

@@ -18,8 +18,10 @@ class CVarRuntimeUsingRecord: public CVarRuntime {
 
     public:
         CVarRuntimeUsingRecord(Type type, string name, int column);
+        CVarRuntimeUsingRecord(Type type, string name, int column, string tableName);
         virtual Record Value();
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
         virtual void Op(vector<IVariable*>& params){};
-        void Update(Record* pRow);
+        virtual void Update(Record* value);
+        virtual void Combine(Record* value);
 };

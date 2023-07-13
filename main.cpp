@@ -24,6 +24,7 @@ void selectTest();
 bool TestGt();
 void ftoiTest();
 void selectThenProject();
+void joinTest();
 
 //bool TestBoolScaOpTree();
 
@@ -45,7 +46,8 @@ void UnitTests(int argc, char* argv[])
     //selectTest();
     //std::cout << std::boolalpha << TestGt();
     //ftoiTest();
-    selectThenProject();
+    //selectThenProject();
+    joinTest();
 
     //std::cout << std::boolalpha << TestBoolScaOpTree();
 }
@@ -105,7 +107,7 @@ void TestScaOpTreeWithParams()
     JobEval<IScalar, Record, vector<IVariable*>>* tree = new JobEval<IScalar, Record, vector<IVariable*>>();
     vector<IVariable*> params;
     Record output;
-    for(int i = 0; i < 10; i++) {
+    for(unsigned int i = 0; i < 10; i++) {
         params.push_back(new CVarRuntime(Int, "x", new IntValue(i)));
         output = tree->evalTree(addNode, params);
         cout << output.nums.at(0) << "\n";
@@ -276,7 +278,7 @@ void selectThenProject() {
     AccessorRelOp* accessorRelOp = new AccessorRelOp(readAccessor);
     CSelect *selecter = new CSelect(*accessorRelOp, gtNode);
 
-    ScaOpSub *subNode = new ScaOpSub(new FloatValue(2023), new CVarRef(Float, "Age"));
+    ScaOpSub *subNode = new ScaOpSub(new FloatValue(2007), new CVarRef(Float, "Age"));
     ScaOpFtoI *ftoi = new ScaOpFtoI(subNode);
     CVarRef *nameNode = new CVarRef(String, "Name");
     vector<string> colNames;
@@ -294,6 +296,73 @@ void selectThenProject() {
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
     serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
+}
+
+
+void joinTest()
+{
+    string readFilePath1 = "..\\testdata\\oscar_age_female.csv";
+    string readFilePath2 = "..\\testdata\\oscar_age_male.csv";
+    string writeFilePath = "..\\testdata\\oscars_per_year.csv";
+
+    CMemTable *tableW = new CMemTable("Women");
+    CCSVDeserializer *deserializerW = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessorW = tableW->getWriteAccessor();
+    deserializerW->deserialize(readFilePath1, writeAccessorW);
+
+    CMemTable *tableM = new CMemTable("Men");
+    CCSVDeserializer *deserializerM = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessorM = tableM->getWriteAccessor();
+    deserializerM->deserialize(readFilePath2, writeAccessorM);
+
+    ScaOpEq *eqNode = new ScaOpEq(new CVarRef(Int, "Year", "Women"), new CVarRef(Int, "Year", "Men"));
+    CMemReadAccessor readAccessorW = tableW->getAccessor();
+    CMemReadAccessor readAccessorM = tableM->getAccessor();
+    AccessorRelOp* accessorRelOpW = new AccessorRelOp(readAccessorW);
+    AccessorRelOp* accessorRelOpM = new AccessorRelOp(readAccessorM);
+
+    vector<IVariable*> params;
+    CInnerJoin* joiner = new CInnerJoin(*accessorRelOpW, *accessorRelOpM, eqNode);
+
+    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(tree->evalTree(joiner, params)));
+}
+
+
+void joinSortTest()
+{
+    string readFilePath1 = "..\\testdata\\oscar_age_female.csv";
+    string readFilePath2 = "..\\testdata\\oscar_age_male.csv";
+    string writeFilePath = "..\\testdata\\oscars_per_year.csv";
+
+    CMemTable *tableW = new CMemTable("Women");
+    CCSVDeserializer *deserializerW = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessorW = tableW->getWriteAccessor();
+    deserializerW->deserialize(readFilePath1, writeAccessorW);
+
+    CMemTable *tableM = new CMemTable("Men");
+    CCSVDeserializer *deserializerM = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessorM = tableM->getWriteAccessor();
+    deserializerM->deserialize(readFilePath2, writeAccessorM);
+
+    ScaOpEq *eqNode = new ScaOpEq(new CVarRef(Int, "Year", "Women"), new CVarRef(Int, "Year", "Men"));
+    CMemReadAccessor readAccessorW = tableW->getAccessor();
+    CMemReadAccessor readAccessorM = tableM->getAccessor();
+    AccessorRelOp* accessorRelOpW = new AccessorRelOp(readAccessorW);
+    AccessorRelOp* accessorRelOpM = new AccessorRelOp(readAccessorM);
+
+    vector<IVariable*> params;
+    CInnerJoin* joiner = new CInnerJoin(*accessorRelOpW, *accessorRelOpM, eqNode);
+
+    ScaOpComp *comparer = new ScaOpComp(new CVarRef(Int, "Year", ""));
+    CSortRelOp* sorter = new CSortRelOp(joiner, comparer);
+
+    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(tree->evalTree(sorter, params)));
 }
 
 /*

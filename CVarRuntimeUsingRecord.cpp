@@ -14,6 +14,12 @@ CVarRuntimeUsingRecord::CVarRuntimeUsingRecord(Type type, string name, int colum
     this->col = column;
 }
 
+CVarRuntimeUsingRecord::CVarRuntimeUsingRecord(Type type, string name, int column, string tableName)
+    : CVarRuntime(type, name, nullptr, tableName)
+{
+    this->col = column;
+}
+
 void CVarRuntimeUsingRecord::Update(Record* value) {
     this->prow = value;
 
@@ -41,6 +47,10 @@ void CVarRuntimeUsingRecord::Update(Record* value) {
             throw("Invalid type");  
             break;
     }
+}
+
+void CVarRuntimeUsingRecord::Combine(Record* value) {
+   throw("What?");
 }
 
 Record CVarRuntimeUsingRecord::Value() {

@@ -17,18 +17,22 @@ void CCSVSerializer::serialize(string path, IAccessor &tableReader) {
     std::ofstream file(path); 
     
     string header = "";
-    for(int i = 0; i < tableReader.getCols(); i++) {
+    for(unsigned int i = 0; i < tableReader.getCols(); i++) {
         header += tableReader.getColName(i) + ":";
         header += toString(tableReader.getColType(i)) + ", ";
     }
     header = string(header.begin(), header.end() - 2);
     file << header << "\n";
 
-    Record *record = tableReader.getNextRecord();
-    while(record != nullptr) {
+    int rowNum = 1;
+    while(true) {
+        Record *record = tableReader.getNextRecord();
+        if(record == nullptr) {
+            break;
+        }
         string row = "";
         vector<int> indices (EnumCount, 0);
-        for(int i = 0; i < tableReader.getCols(); i++) {
+        for(unsigned int i = 0; i < tableReader.getCols(); i++) {
             Type type = tableReader.getColType(i);
             switch(type)
             {
@@ -72,9 +76,10 @@ void CCSVSerializer::serialize(string path, IAccessor &tableReader) {
             row += ", ";
         }
         row = string(row.begin(), row.end() - 2);
+        ITracer::GetTracer()->Trace("Row %d printed\n", rowNum);
         file << row + "\n";
-        record = tableReader.getNextRecord();
-    }    
+        rowNum++;
+    }
     file.close();
 }
 

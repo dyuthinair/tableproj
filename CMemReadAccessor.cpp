@@ -7,9 +7,12 @@
 
 using namespace std;
 
-CMemReadAccessor::CMemReadAccessor(std::vector<string> *colNames, 
+CMemReadAccessor::CMemReadAccessor(string tableName, 
+    std::vector<string> *colNames, 
     std::vector<Type> *colTypes, 
     std::vector<Record*> *records) {
+
+    this->tableName = tableName;
     this->colNames = colNames;
     this->colTypes = colTypes;
     this->records = records;
@@ -17,7 +20,7 @@ CMemReadAccessor::CMemReadAccessor(std::vector<string> *colNames,
     row = 0;
 }
 
-int CMemReadAccessor::getCols() {
+unsigned int CMemReadAccessor::getCols() {
     return colNames->size();
 }
 
@@ -30,12 +33,16 @@ std::string CMemReadAccessor::getColName(int col) {
 }
 
 Record* CMemReadAccessor::getNextRecord() {
-    row++;
-    if(row > records->size()) {
+    if (row < records->size()) {
+        row++;
+        return records->at(row-1);
+    } else {
         row = 0;
         return nullptr;
-    } else {
-        return records->at(row-1);
     }
+}
+
+string CMemReadAccessor::getName() {
+    return tableName;
 }
 

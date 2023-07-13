@@ -48,18 +48,19 @@ class Record
         std::vector<float> floats;
         std::vector<bool> booleans;
 
-        bool operator==(const Record &rhs ) {
-            return strings == rhs.strings
-            && nums == rhs.nums
-            && floats == rhs.floats
-            && booleans == rhs.booleans;
-        }   
-
         void copy(const Record& rec) {
+            this->strings.clear();
+            this->nums.clear();
+            this->floats.clear();
+            this->booleans.clear();
+            this->add(rec);
+        }
+
+        void add(const Record& rec) {
             for(string str : rec.strings) {
                 this->strings.push_back(str);
             }
-            for(int num : rec.nums) {
+            for(unsigned int num : rec.nums) {
                 this->nums.push_back(num);
             }
             for(float num : rec.floats) {
@@ -69,30 +70,16 @@ class Record
                 this->booleans.push_back(boolean);
             }
         }
-
-        void clear() {
-            while(!strings.empty()) {
-                strings.pop_back();
-            }
-            while(!nums.empty()) {
-                nums.pop_back();
-            }
-            while(!floats.empty()) {
-                floats.pop_back();
-            }
-            while(!booleans.empty()) {
-                booleans.pop_back();
-            }
-        }
 };
 
 class IAccessor
 {
     public: 
-        int virtual getCols() = 0;
+        unsigned int virtual getCols() = 0;
         Type virtual getColType(int col) = 0;
         string virtual getColName(int col) = 0;
         Record virtual *getNextRecord() = 0;
+        string virtual getName() = 0;
 };
 
 

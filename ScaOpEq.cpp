@@ -25,7 +25,7 @@ void ScaOpEq::Op(vector<IVariable*>& params) {
             case Int: 
                 result = val1->Value().nums.at(0) == val2->Value().nums.at(0);
                 this->eval = BoolValue(result);
-                ITracer::GetTracer()->Trace("ScaOpEq::Op result: %d > %d is %s\n", val1->Value().nums.at(0), val2->Value().nums.at(0), result ? "true" : "false");
+                ITracer::GetTracer()->Trace("ScaOpEq::Op result: %d = %d is %s\n", val1->Value().nums.at(0), val2->Value().nums.at(0), result ? "true" : "false");
                 break;
             case Float: 
                 this->eval = BoolValue(val1->Value().floats.at(0) == val2->Value().floats.at(0));
@@ -245,7 +245,7 @@ void ScaOpLt::Op(vector<IVariable*>& params)
             case Int: 
                 result = val1->Value().nums.at(0) < val2->Value().nums.at(0);
                 this->eval = BoolValue(result);
-                ITracer::GetTracer()->Trace("ScaOpLt::Op result: %d > %d is %s\n", val1->Value().nums.at(0), val2->Value().nums.at(0), result ? "true" : "false");
+                ITracer::GetTracer()->Trace("ScaOpLt::Op result: %d < %d is %s\n", val1->Value().nums.at(0), val2->Value().nums.at(0), result ? "true" : "false");
                 break;
             case Float: 
                 this->eval = BoolValue(val1->Value().floats.at(0) < val2->Value().floats.at(0));

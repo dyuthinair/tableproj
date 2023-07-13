@@ -23,7 +23,8 @@ class IVariable:public IScalar {
         virtual string Name() = 0;
         virtual Type getType() = 0;
         virtual Record Value() = 0;
-        void Update(Record* value) ;
+        virtual void Update(Record* value) = 0;
+        virtual void Combine(Record* value) = 0;
 };
 
 class IScaOp: public IScalar {
@@ -46,13 +47,21 @@ class CVarRef: public IVariable {
     string name;
     Type type;
     Record* value;
+    int index;
 
     public:
         CVarRef(Type type, string name);
-        string Name();
-        Type getType();
-        Record Value();
-        void Op(vector<IVariable*>& params);
+        CVarRef(Type type, string name, string tableName);
+
+        // Implement IVariable
+        virtual string Name();
+        virtual Type getType();
+        virtual Record Value();
+        virtual void Update(Record* value);
+        virtual void Combine(Record* value);
+
+        // Implement IScalar
+        virtual void Op(vector<IVariable*>& params);
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
 };
 
@@ -63,10 +72,15 @@ class CVarRuntime: public IVariable {
 
     public:
         CVarRuntime(Type type, string name, Record* value);
-        string Name();
-        Type getType();
-        Record Value();
-        void update(Record* value);
+        CVarRuntime(Type type, string name, Record* value, string tableName);
+        
+         // Implement IVariable
+        virtual string Name();
+        virtual Type getType();
+        virtual Record Value();
+        virtual void Update(Record* value);
+        virtual void Combine(Record* value);
+
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
         virtual void Op(vector<IVariable*>& params){};
 };

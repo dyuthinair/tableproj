@@ -12,6 +12,12 @@ CVarRuntime::CVarRuntime(Type type, string name, Record* value) {
     this->value = value;
 }
 
+CVarRuntime::CVarRuntime(Type type, string name, Record* value, string tableName) {
+    this->type = type;
+    this->name = tableName + ":" + name;
+    this->value = value;
+}
+
 Type CVarRuntime::getType() {
     return type;
 }
@@ -24,8 +30,10 @@ Record CVarRuntime::Value() {
     return *value;
 }
 
-void CVarRuntime::update(Record* value) {
+void CVarRuntime::Update(Record* value) {
     this->value = value;
 }
 
-
+void CVarRuntime::Combine(Record* value) {
+    throw("How to combine CVarRunTIme?");
+}
