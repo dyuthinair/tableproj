@@ -4,6 +4,7 @@
 /*                                               */
 /*************************************************/
 #include "CMemTable.hpp"
+#include <memory>
 
 using namespace std;
 
@@ -21,7 +22,7 @@ CMemTable::CMemTable(string tableName) {
 }
 
 CMemReadAccessor& CMemTable::getAccessor() {
-    CMemReadAccessor *reader = new CMemReadAccessor(tableName, colNames, colTypes, records);
+    unique_ptr<CMemReadAccessor> reader(new CMemReadAccessor(tableName, colNames, colTypes, records));
     return *reader;
 }
 

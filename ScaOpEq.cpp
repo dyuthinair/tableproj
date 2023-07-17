@@ -315,6 +315,73 @@ vector<IJob<IScalar, Record, vector<IVariable*>>*>* ScaOpFtoI::getChildren() {
     return children;
 }
 
+ScaOpComp::ScaOpComp(IScalar *val1, IScalar *val2) 
+ : val1(val1), val2(val2)
+{
+    
+}
+
+void ScaOpComp::Op(vector<IVariable*>& params)
+{
+    ITracer::GetTracer()->Trace("ScaOpComp::Op called \n");
+    bool result;
+
+    if(val1->getType() == val2->getType()) {
+        switch(val1->getType()) {
+            case String: 
+                int comp = val1->Value().strings.at(0).compare(val2->Value().strings.at(0));
+                this->eval = IntValue(normalizeEval(comp));
+                ITracer::GetTracer()->Trace("ScaOpComp::Op result %s\n", eval.Value().nums.at(0));
+                break;
+            case Int: 
+                int comp = val1->Value().nums.at(0) - val2->Value().nums.at(0);
+                this->eval = IntValue(normalizeEval(comp));
+                ITracer::GetTracer()->Trace("ScaOpComp::Op result %s\n", eval.Value().nums.at(0));
+                break;
+            case Float: 
+                int comp = val1->Value().floats.at(0) - val2->Value().floats.at(0);
+                this->eval = IntValue(normalizeEval(comp));
+                ITracer::GetTracer()->Trace("ScaOpComp::Op result %s\n", eval.Value().nums.at(0));
+                break;
+            case Boolean: 
+                int comp = val1->Value().booleans.at(0) - val2->Value().booleans.at(0);
+                this->eval = IntValue(normalizeEval(comp));
+                ITracer::GetTracer()->Trace("ScaOpComp::Op result %s\n", eval.Value().nums.at(0));
+                break;
+            case EnumCount:
+                throw("Not a real type");
+                break;
+        }
+    }  else {
+        throw("Type mismatch");
+    }
+}
+
+Record ScaOpComp::Value() {
+    return eval.Value();
+}
+
+Type ScaOpComp::getType() {
+    return Int;
+}
+
+vector<IJob<IScalar, Record, vector<IVariable*>>*>* ScaOpComp::getChildren() {
+    vector<IJob*>* children = new vector<IJob*>();
+    children->push_back(val1);
+    children->push_back(val2);
+    return children;
+}
+
+int normalizeEval(int difference) {
+    if(difference == 0) {
+        return 0;
+    } else if(difference > 0) {
+        return 1;
+    } else {
+        return -1;
+    }
+}
+
 /*
 
 ScaOpAnd::ScaOpAnd(IScalar *val1, IScalar *val2) 

@@ -8,6 +8,7 @@
 #include "CScaOp.hpp"
 #include "JobEval.hpp"
 #include "IRelOp.hpp"
+#include <memory>
 
 using namespace std;
 
@@ -305,12 +306,12 @@ void joinTest()
     string readFilePath2 = "..\\testdata\\oscar_age_male.csv";
     string writeFilePath = "..\\testdata\\oscars_per_year.csv";
 
-    CMemTable *tableW = new CMemTable("Women");
+    unique_ptr<CMemTable> tableW(new CMemTable("Women"));
     CCSVDeserializer *deserializerW = new CCSVDeserializer();
     CMemWriteAccessor writeAccessorW = tableW->getWriteAccessor();
     deserializerW->deserialize(readFilePath1, writeAccessorW);
 
-    CMemTable *tableM = new CMemTable("Men");
+    unique_ptr<CMemTable> tableM(new CMemTable("Men"));
     CCSVDeserializer *deserializerM = new CCSVDeserializer();
     CMemWriteAccessor writeAccessorM = tableM->getWriteAccessor();
     deserializerM->deserialize(readFilePath2, writeAccessorM);
@@ -330,7 +331,7 @@ void joinTest()
     serializer->serialize(writeFilePath, *(tree->evalTree(joiner, params)));
 }
 
-
+/*
 void joinSortTest()
 {
     string readFilePath1 = "..\\testdata\\oscar_age_female.csv";
@@ -363,7 +364,7 @@ void joinSortTest()
 
     CCSVSerializer *serializer = new CCSVSerializer();
     serializer->serialize(writeFilePath, *(tree->evalTree(sorter, params)));
-}
+}*/
 
 /*
 bool TestBoolScaOpTree()

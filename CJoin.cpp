@@ -1,6 +1,7 @@
 #include "IRelOp.hpp"
 #include "CMemTable.hpp"
 #include "CVarRuntimeUsingRecord.hpp"
+#include <memory>
 
 using namespace std;
 
@@ -19,7 +20,7 @@ vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* CInnerJoin::getChildren()
 void CInnerJoin::Op(vector<IVariable*>& params) {
     ITracer::GetTracer()->Trace("CJoin::Op Called\n");
 
-    CMemTable *outputTable = new CMemTable();
+    unique_ptr<CMemTable> outputTable(new CMemTable());
     IWriteAccessor& writeAccessor = outputTable->getWriteAccessor();
     
     IAccessor& inputAccessor1 = *children.at(0)->Value();

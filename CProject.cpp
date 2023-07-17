@@ -7,6 +7,7 @@
 #include "IRelOp.hpp" 
 #include "CMemTable.hpp"
 #include "CVarRuntimeUsingRecord.hpp"
+#include <memory>
 
 CProject::CProject(IRelOp& child, vector<string> colNames, vector<Type> colTypes, 
                     vector<IScalar*> trees) {
