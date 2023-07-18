@@ -22,7 +22,7 @@ CMemTable::CMemTable(string tableName) {
 }
 
 CMemReadAccessor& CMemTable::getAccessor() {
-    unique_ptr<CMemReadAccessor> reader(new CMemReadAccessor(tableName, colNames, colTypes, records));
+    CMemReadAccessor *reader = new CMemReadAccessor(tableName, colNames, colTypes, records);
     return *reader;
 }
 

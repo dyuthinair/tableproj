@@ -324,29 +324,30 @@ ScaOpComp::ScaOpComp(IScalar *val1, IScalar *val2)
 void ScaOpComp::Op(vector<IVariable*>& params)
 {
     ITracer::GetTracer()->Trace("ScaOpComp::Op called \n");
-    bool result;
-
+    
+    int comp;
     if(val1->getType() == val2->getType()) {
         switch(val1->getType()) {
             case String: 
-                int comp = val1->Value().strings.at(0).compare(val2->Value().strings.at(0));
+                comp = val1->Value().strings.at(0).compare(val2->Value().strings.at(0));
                 this->eval = IntValue(normalizeEval(comp));
-                ITracer::GetTracer()->Trace("ScaOpComp::Op result %s\n", eval.Value().nums.at(0));
+                ITracer::GetTracer()->Trace("ScaOpComp::Op result %d\n", eval.Value().nums.at(0));
                 break;
             case Int: 
-                int comp = val1->Value().nums.at(0) - val2->Value().nums.at(0);
+                comp = val1->Value().nums.at(0) - val2->Value().nums.at(0);
                 this->eval = IntValue(normalizeEval(comp));
-                ITracer::GetTracer()->Trace("ScaOpComp::Op result %s\n", eval.Value().nums.at(0));
+                ITracer::GetTracer()->Trace("ScaOpComp::Op result %d\n", eval.Value().nums.at(0));
                 break;
             case Float: 
-                int comp = val1->Value().floats.at(0) - val2->Value().floats.at(0);
+                comp = static_cast<int>(100*(val1->Value().floats.at(0) - val2->Value().floats.at(0)));
                 this->eval = IntValue(normalizeEval(comp));
-                ITracer::GetTracer()->Trace("ScaOpComp::Op result %s\n", eval.Value().nums.at(0));
+                ITracer::GetTracer()->Trace("ScaOpComp::Op between %f and %f results in %d\n", 
+                    val1->Value().floats.at(0), val2->Value().floats.at(0), eval.Value().nums.at(0));
                 break;
             case Boolean: 
-                int comp = val1->Value().booleans.at(0) - val2->Value().booleans.at(0);
+                comp = val1->Value().booleans.at(0) - val2->Value().booleans.at(0);
                 this->eval = IntValue(normalizeEval(comp));
-                ITracer::GetTracer()->Trace("ScaOpComp::Op result %s\n", eval.Value().nums.at(0));
+                ITracer::GetTracer()->Trace("ScaOpComp::Op result %d\n", eval.Value().nums.at(0));
                 break;
             case EnumCount:
                 throw("Not a real type");
@@ -372,13 +373,15 @@ vector<IJob<IScalar, Record, vector<IVariable*>>*>* ScaOpComp::getChildren() {
     return children;
 }
 
-int normalizeEval(int difference) {
+int ScaOpComp::normalizeEval(int difference) {
     if(difference == 0) {
         return 0;
     } else if(difference > 0) {
         return 1;
-    } else {
+    } else if (difference < 0) {
         return -1;
+    } else {
+        throw("Unreachable code");
     }
 }
 

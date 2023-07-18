@@ -26,6 +26,8 @@ bool TestGt();
 void ftoiTest();
 void selectThenProject();
 void joinTest();
+void sortTest();
+void TestComp();
 
 //bool TestBoolScaOpTree();
 
@@ -48,7 +50,9 @@ void UnitTests(int argc, char* argv[])
     //std::cout << std::boolalpha << TestGt();
     //ftoiTest();
     //selectThenProject();
-    joinTest();
+    //joinTest();
+    sortTest();
+    //TestComp();
 
     //std::cout << std::boolalpha << TestBoolScaOpTree();
 }
@@ -329,6 +333,49 @@ void joinTest()
 
     CCSVSerializer *serializer = new CCSVSerializer();
     serializer->serialize(writeFilePath, *(tree->evalTree(joiner, params)));
+}
+
+void sortTest()
+{
+    string readFilePath = "..\\testdata\\mlb_players.csv";
+    string writeFilePath = "..\\testdata\\baseball_output_sorted.csv";
+
+    CMemTable *table = new CMemTable();
+    CCSVDeserializer *deserializer = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessor = table->getWriteAccessor();
+    deserializer->deserialize(readFilePath, writeAccessor);
+
+    CMemReadAccessor readAccessor = table->getAccessor();
+    AccessorRelOp* accessorRelOp = new AccessorRelOp(readAccessor);
+    vector<IVariable*> params;
+
+    CSortOp* sorter = new CSortOp(*accessorRelOp, "Weight(lbs)");
+    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(tree->evalTree(sorter, params)));
+}
+
+void TestComp()
+{
+    ScaOpComp *addNode1 = new ScaOpComp(new IntValue(6), new IntValue(7));
+    //addNode->Op();
+    JobEval<IScalar, Record, vector<IVariable*>>* tree = new JobEval<IScalar, Record, vector<IVariable*>>();
+    vector<IVariable*> params;
+    Record output = tree->evalTree(addNode1, params);
+
+    cout << output.nums.at(0) << "\n";
+
+    ScaOpComp *addNode2 = new ScaOpComp(new IntValue(6), new IntValue(6));
+    //addNode->Op();
+    Record output2 = tree->evalTree(addNode2, params);
+
+    cout << output2.nums.at(0) << "\n";
+
+    ScaOpComp *addNode3 = new ScaOpComp(new IntValue(6), new IntValue(5));
+    //addNode->Op();
+    Record output3 = tree->evalTree(addNode3, params);
+
+    cout << output3.nums.at(0) << "\n";
 }
 
 /*

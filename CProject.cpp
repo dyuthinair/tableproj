@@ -34,28 +34,8 @@ void CProject::Op(vector<IVariable*>& params) {
     for(unsigned int i = 0; i < inputAccessor.getCols(); i++) {
         Type curType = inputAccessor.getColType(i);
         string colName = inputAccessor.getColName(i);
-        switch(curType)
-        {
-            case String:
-                runtimeParams.push_back(new CVarRuntimeUsingRecord(String, colName, indices[String]));
-                indices[String]++;
-                break;
-            case Int: 
-                runtimeParams.push_back(new CVarRuntimeUsingRecord(Int, colName, indices[Int]));
-                indices[Int]++;
-                break;
-            case Float: 
-                runtimeParams.push_back(new CVarRuntimeUsingRecord(Float, colName, indices[Float]));
-                indices[Float]++;
-                break;
-            case Boolean: 
-                runtimeParams.push_back(new CVarRuntimeUsingRecord(Boolean, colName, indices[Boolean]));
-                indices[Boolean]++;
-                break;
-            case EnumCount:
-                throw("Invalid type");  
-                break;
-        }
+        runtimeParams.push_back(new CVarRuntimeUsingRecord(curType, colName, indices[curType]));
+        indices[curType]++;
     }
 
     while(true) {

@@ -78,3 +78,16 @@ class CInnerJoin : public IJoin {
         virtual void Op(vector<IVariable*>& params);
         virtual IAccessor* Value();
 };
+
+class CSortOp : public IJoin {
+    vector<IRelOp*> children;
+    vector<IJob<IRelOp, IAccessor*, std::vector<IVariable*>>*> childJobs;
+    string colName;
+    IAccessor* outputAccessor;
+
+    public:
+        CSortOp(IRelOp& child1, string colName);
+        virtual vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* getChildren();
+        virtual void Op(vector<IVariable*>& params);
+        virtual IAccessor* Value();
+};

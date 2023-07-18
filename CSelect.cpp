@@ -36,28 +36,8 @@ void CSelect::Op(vector<IVariable*>& params) {
         colNames.push_back(colName);
         colTypes.push_back(curType);
         
-        switch(curType)
-        {
-            case String:
-                runtimeParams.push_back(new CVarRuntimeUsingRecord(String, colName, indices[String]));
-                indices[String]++;
-                break;
-            case Int: 
-                runtimeParams.push_back(new CVarRuntimeUsingRecord(Int, colName, indices[Int]));
-                indices[Int]++;
-                break;
-            case Float: 
-                runtimeParams.push_back(new CVarRuntimeUsingRecord(Float, colName, indices[Float]));
-                indices[Float]++;
-                break;
-            case Boolean: 
-                runtimeParams.push_back(new CVarRuntimeUsingRecord(Boolean, colName, indices[Boolean]));
-                indices[Boolean]++;
-                break;
-            case EnumCount:
-                throw("Invalid type");  
-                break;
-        }
+        runtimeParams.push_back(new CVarRuntimeUsingRecord(curType, colName, indices[curType]));
+        indices[curType]++;
     }
     writeAccessor.setColNames(colNames);
     writeAccessor.setColTypes(colTypes);

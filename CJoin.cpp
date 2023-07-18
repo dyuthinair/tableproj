@@ -115,3 +115,4 @@ void CInnerJoin::CollectMetadata(IAccessor& accessor,
 IAccessor* CInnerJoin::Value() {
     return outputAccessor;
 }
+

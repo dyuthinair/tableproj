@@ -45,6 +45,7 @@ void CVarRef::Op(vector<IVariable*>& params) {
             }
             index++;
         }
+        throw("Did not find runtime value");
     } else {
         IVariable* curVar = params.at(index);
         Record *var = new Record();
