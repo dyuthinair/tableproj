@@ -16,6 +16,7 @@ class IScalar : public IJob<IScalar, Record, vector<IVariable*>>{
         virtual Type getType() = 0;
         virtual Record Value() = 0;
         virtual void Op(vector<IVariable*> &variables) = 0;
+        virtual int Comp(IScalar& rhs) = 0;
 };
 
 class IVariable:public IScalar {
@@ -25,6 +26,7 @@ class IVariable:public IScalar {
         virtual Record Value() = 0;
         virtual void Update(Record* value) = 0;
         virtual void Combine(Record* value) = 0;
+        virtual int Comp(IScalar& rhs) = 0;
 };
 
 class IScaOp: public IScalar {
@@ -41,6 +43,7 @@ class CConstVal: public IScalar, public Record {
         virtual Record Value() = 0;
         virtual void Op(vector<IVariable*>& params) {};
         virtual void update(Record* value) {};
+        virtual int Comp(IScalar& rhs) {throw("Should never be called");};
 };
 
 class CVarRef: public IVariable {
@@ -63,6 +66,8 @@ class CVarRef: public IVariable {
         // Implement IScalar
         virtual void Op(vector<IVariable*>& params);
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
+
+        virtual int Comp(IScalar& rhs) {throw("Should never be called");};
 };
 
 class CVarRuntime: public IVariable {
@@ -83,6 +88,8 @@ class CVarRuntime: public IVariable {
 
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
         virtual void Op(vector<IVariable*>& params){};
+
+        virtual int Comp(IScalar& rhs) {throw("Should never be called");};
 };
 
 class IntValue: public CConstVal
@@ -179,6 +186,25 @@ class BoolValue: public CConstVal
             booleans.pop_back();
             booleans.push_back(value);
         }
+};
+
+class CRecordColumn:public IScalar {
+
+    int col;
+    Type type;
+    Record* record;
+
+    int normalizeEval(int difference);
+
+    public:
+        CRecordColumn(int col, Type type, Record* record);
+        virtual Type getType();
+        virtual Record Value();
+        virtual void Op(vector<IVariable*> &variables);
+        virtual void Update(Record* value);
+        virtual int Comp(IScalar& rhs);
+
+        virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
 };
 
 

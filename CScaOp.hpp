@@ -10,6 +10,7 @@ using namespace std;
 
 class CScaOp: public IScaOp {
     virtual void Op(vector<IVariable*>& params) = 0;
+    virtual int Comp(IScalar& rhs) {throw("Should never be called");};
 };
 
 class ScaOpEq: public CScaOp
