@@ -48,6 +48,13 @@ class Record
         std::vector<float> floats;
         std::vector<bool> booleans;
 
+        bool operator==(const Record &rhs ) {
+            return strings == rhs.strings
+            && nums == rhs.nums
+            && floats == rhs.floats
+            && booleans == rhs.booleans;
+        }   
+
         void copy(const Record& rec) {
             this->strings.clear();
             this->nums.clear();

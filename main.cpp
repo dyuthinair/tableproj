@@ -28,6 +28,8 @@ void selectThenProject();
 void joinTest();
 void sortTest();
 void TestComp();
+void mergeJoinTest();
+void mergeJoinTestLarge();
 
 //bool TestBoolScaOpTree();
 
@@ -51,8 +53,10 @@ void UnitTests(int argc, char* argv[])
     //ftoiTest();
     //selectThenProject();
     //joinTest();
-    sortTest();
+    //sortTest();
     //TestComp();
+    //mergeJoinTest();
+    mergeJoinTestLarge();
 
     //std::cout << std::boolalpha << TestBoolScaOpTree();
 }
@@ -349,7 +353,7 @@ void sortTest()
     AccessorRelOp* accessorRelOp = new AccessorRelOp(readAccessor);
     vector<IVariable*> params;
 
-    CSortOp* sorter = new CSortOp(*accessorRelOp, "Weight(lbs)");
+    CSortOp* sorter = new CSortOp(*accessorRelOp, "Name");
     JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
     CCSVSerializer *serializer = new CCSVSerializer();
     serializer->serialize(writeFilePath, *(tree->evalTree(sorter, params)));
@@ -376,6 +380,77 @@ void TestComp()
     Record output3 = tree->evalTree(addNode3, params);
 
     cout << output3.nums.at(0) << "\n";
+}
+
+void mergeJoinTest()
+{
+    string readFilePath1 = "..\\testdata\\oscar_age_female.csv";
+    string readFilePath2 = "..\\testdata\\oscar_age_male.csv";
+    string writeFilePath = "..\\testdata\\oscars_per_year.csv";
+
+    unique_ptr<CMemTable> tableW(new CMemTable("Women"));
+    CCSVDeserializer *deserializerW = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessorW = tableW->getWriteAccessor();
+    deserializerW->deserialize(readFilePath1, writeAccessorW);
+
+    unique_ptr<CMemTable> tableM(new CMemTable("Men"));
+    CCSVDeserializer *deserializerM = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessorM = tableM->getWriteAccessor();
+    deserializerM->deserialize(readFilePath2, writeAccessorM);
+
+    ScaOpComp *compNode = new ScaOpComp(new CVarRef(String, "Movie", "Women"), new CVarRef(String, "Movie", "Men"));
+    CMemReadAccessor readAccessorW = tableW->getAccessor();
+    CMemReadAccessor readAccessorM = tableM->getAccessor();
+    AccessorRelOp* accessorRelOpW = new AccessorRelOp(readAccessorW);
+    AccessorRelOp* accessorRelOpM = new AccessorRelOp(readAccessorM);
+
+    vector<IVariable*> params;
+
+    CSortOp* sorterW = new CSortOp(*accessorRelOpW, "Movie");
+    CSortOp* sorterM = new CSortOp(*accessorRelOpM, "Movie");
+
+    CMergeJoin* joiner = new CMergeJoin(*sorterW, *sorterM, compNode);
+
+    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(tree->evalTree(joiner, params)));
+}
+
+
+void mergeJoinTestLarge()
+{
+    string readFilePath1 = "..\\testdata\\annual-enterprise-survey-2021-financial-year-provisional-csv.csv";
+    string readFilePath2 = "..\\testdata\\annual-enterprise-survey-2021-financial-year-provisional-size-bands-csv.csv";
+    string writeFilePath = "..\\testdata\\info_by_industry.csv";
+
+    unique_ptr<CMemTable> tableS(new CMemTable("Without Size Bands"));
+    CCSVDeserializer *deserializerS = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessorS = tableS->getWriteAccessor();
+    deserializerS->deserialize(readFilePath1, writeAccessorS);
+
+    unique_ptr<CMemTable> tableN(new CMemTable("Size Bands"));
+    CCSVDeserializer *deserializerN = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessorN = tableN->getWriteAccessor();
+    deserializerN->deserialize(readFilePath2, writeAccessorN);
+
+    ScaOpComp *compNode = new ScaOpComp(new CVarRef(String, "Without Size Bands", "Industry_name_NZSIOC"), new CVarRef(String, "Size Bands", "industry_code_ANZSIC"));
+    CMemReadAccessor readAccessorS = tableS->getAccessor();
+    CMemReadAccessor readAccessorN = tableN->getAccessor();
+    AccessorRelOp* accessorRelOpS = new AccessorRelOp(readAccessorS);
+    AccessorRelOp* accessorRelOpN = new AccessorRelOp(readAccessorN);
+
+    vector<IVariable*> params;
+
+    CSortOp* sorterS = new CSortOp(*accessorRelOpS, "Without Size Bands");
+    CSortOp* sorterN = new CSortOp(*accessorRelOpN, "Size Bands");
+
+    CMergeJoin* joiner = new CMergeJoin(*sorterS, *sorterN, compNode);
+
+    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(tree->evalTree(joiner, params)));
 }
 
 /*

@@ -2,6 +2,8 @@
 #include "CMemTable.hpp"
 #include "CVarRuntimeUsingRecord.hpp"
 #include <memory>
+#include <queue>
+
 
 using namespace std;
 
@@ -11,6 +13,7 @@ CMergeJoin::CMergeJoin(IRelOp& child1, IRelOp& child2, IScalar* tree) {
     this->childJobs.assign(children.begin(), children.end());
     this->tree = tree;
     outputAccessor = nullptr;
+    evaluator = new JobEval<IScalar, Record, vector<IVariable*>>();
 }
 
 vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* CMergeJoin::getChildren() {
@@ -37,48 +40,84 @@ void CMergeJoin::Op(vector<IVariable*>& params) {
     writeAccessor.setColNames(outputNames);
     writeAccessor.setColTypes(outputTypes);
 
-    Record* nextRecord1 = inputAccessor1.getNextRecord();
-    Record* nextRecord2 = inputAccessor2.getNextRecord();
+    Record* leftRecord = inputAccessor1.getNextRecord();
+    Record* rightRecord = inputAccessor2.getNextRecord();
 
-    bool moved1 = true;
-    bool moved2 = true;
+    bool changedLeftRow = true;
+    bool changedRightRow = true;
 
-    while(nextRecord1 != nullptr || nextRecord2 != nullptr) {
-        if(moved1) {
-            for(unsigned int paramCol = 0; paramCol < inputAccessor1.getCols(); paramCol++) { //iterates over first half of the parameters
-                CVarRuntimeUsingRecord* param = runtimeParams.at(paramCol);
-                param->Update(nextRecord1);
-            } 
+    vector<Record*> duplicates;
+    while(leftRecord != nullptr && rightRecord != nullptr) {
+        int eval = EvalCurrentRow(changedLeftRow, changedRightRow, inputAccessor1.getCols(), leftRecord, rightRecord, runtimeParams);
+        
+        if(eval == 0) {
+            ProduceRecord(leftRecord, rightRecord, writeAccessor);
+            duplicates.push_back(rightRecord);
         }
-
-        if(moved2) {
-            for(unsigned int paramCol = inputAccessor1.getCols(); paramCol < runtimeParams.size(); paramCol++) { //iterates over first half of the parameters
-                CVarRuntimeUsingRecord* param = runtimeParams.at(paramCol);
-                param->Update(nextRecord2);
-            } 
-        }
-        vector<IVariable*> varParams;
-        varParams.assign(runtimeParams.begin(), runtimeParams.end());
-        JobEval<IScalar, Record, vector<IVariable*>>* evaluator = new JobEval<IScalar, Record, vector<IVariable*>>();
-        Record curEval = evaluator->evalTree(tree, varParams);
-        if(curEval.booleans.empty()) {
-            throw("Join scalars should evaluate to be a boolean value");
+        if(eval == -1) {
+            leftRecord = inputAccessor1.getNextRecord();
+            changedLeftRow = true;
+            changedRightRow = !duplicates.empty();
+            if (changedRightRow)
+            {
+                HandleDuplicates(leftRecord, duplicates, inputAccessor1.getCols(), writeAccessor, runtimeParams);
+            }
+            ITracer::GetTracer()->Trace("table1 increments\n");
+        } else
+        {
+            rightRecord = inputAccessor2.getNextRecord();
+            changedLeftRow = false;
+            changedRightRow = true;
         } 
-
-        if(curEval.booleans.at(0)) {
-            Record* newRecord = new Record();
-            newRecord->copy(*nextRecord1);
-            newRecord->add(*nextRecord2);
-            writeAccessor.pushRow(newRecord);
-            ITracer::GetTracer()->Trace("Record added\n");
-        }                
-
-        //how to compare
-        //how to iterate if they are the same
-
     }
       
     this->outputAccessor = &outputTable->getAccessor();
+}
+
+int CMergeJoin::EvalCurrentRow(bool updateLeft, bool updateRight, int leftcols, Record* left, Record* right, vector<CVarRuntimeUsingRecord*>& runtimeParams)
+{
+    if(updateLeft) {
+        for(int paramCol = 0; paramCol < leftcols; paramCol++) { //iterates over first half of the parameters
+            CVarRuntimeUsingRecord* param = runtimeParams.at(paramCol);
+            param->Update(left);
+        } 
+    }
+
+    if(updateRight) {
+        for(int paramCol = leftcols; paramCol < (int) runtimeParams.size(); paramCol++) { //iterates over second half of the parameters
+            CVarRuntimeUsingRecord* param = runtimeParams.at(paramCol);
+            param->Update(right);
+        } 
+    }
+
+    vector<IVariable*> varParams;
+    varParams.assign(runtimeParams.begin(), runtimeParams.end());
+    
+    Record curEval = evaluator->evalTree(tree, varParams);
+    return curEval.nums.at(0);
+}
+
+void CMergeJoin::ProduceRecord(Record* leftRecord, Record* rightRecord, IWriteAccessor& writeAccessor)
+{
+    Record* newRecord = new Record();
+    newRecord->copy(*leftRecord);
+    newRecord->add(*rightRecord);
+    writeAccessor.pushRow(newRecord);
+    ITracer::GetTracer()->Trace("Record added\n");
+}
+
+void CMergeJoin::HandleDuplicates(Record* leftRecord, vector<Record*>& duplicates, int cols, IWriteAccessor& writeAccessor, vector<CVarRuntimeUsingRecord*>& runtimeParams)
+{
+    int eval = EvalCurrentRow(true, true, cols, leftRecord, duplicates.at(0), runtimeParams);
+    if (eval == 0)
+    {
+        ITracer::GetTracer()->Trace("Duplicates on join condition found\n");
+        for(Record* rec:duplicates)
+        {
+            ProduceRecord(leftRecord, rec, writeAccessor);
+        }
+    }
+    duplicates.clear();
 }
 
 void CMergeJoin::CollectMetadata(IAccessor& accessor, 

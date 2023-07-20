@@ -37,8 +37,8 @@ int CRecordColumn::Comp(IScalar& rhs) {
         case String: 
             comp = record->strings.at(col).compare(rhs.Value().strings.at(col));
             comp = normalizeEval(comp);
-            ITracer::GetTracer()->Trace("CRecordColumn::Comp result between %s and %s is %d\n", record->strings.at(col), 
-                                            rhs.Value().strings.at(col), comp);
+            ITracer::GetTracer()->Trace("CRecordColumn::Comp result between %s and %s is %d\n", record->strings.at(col).c_str(), 
+                                            rhs.Value().strings.at(col).c_str(), comp);
             break;
         case Int: 
             comp = record->nums.at(col) - rhs.Value().nums.at(col);

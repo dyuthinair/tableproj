@@ -97,8 +97,12 @@ class CMergeJoin : public IJoin {
     vector<IJob<IRelOp, IAccessor*, std::vector<IVariable*>>*> childJobs;
     IScalar* tree;
     IAccessor* outputAccessor;
+    JobEval<IScalar, Record, vector<IVariable*>>* evaluator;
 
     void CollectMetadata(IAccessor& accessor, vector<CVarRuntimeUsingRecord*>& runtimeParams, vector<string>& names, vector<Type>& types);
+    int EvalCurrentRow(bool updateLeft, bool updateRight, int leftcols, Record* left, Record* right, vector<CVarRuntimeUsingRecord*>& runtimeParams);
+    void ProduceRecord(Record* leftRecord, Record* rightRecord, IWriteAccessor& writeAccessor);
+    void HandleDuplicates(Record* leftRecord, vector<Record*>& duplicates, int cols, IWriteAccessor& writeAccessor, vector<CVarRuntimeUsingRecord*>& runtimeParams);
 
     public:
         CMergeJoin(IRelOp& child1, IRelOp& child2, IScalar* tree);
