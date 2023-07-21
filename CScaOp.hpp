@@ -112,6 +112,20 @@ class ScaOpComp: public CScaOp
         vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren();
 };
 
+class ScaOpAssign: public CScaOp
+{
+    LValue *eval;
+    LValue *val1;
+    IScalar *val2;
+
+    public:
+        ScaOpAssign(LValue *val1, IScalar *val2);
+        void Op(vector<IVariable*>& params);
+        Record Value();
+        Type getType();
+        vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren();
+};
+
 /*
 class ScaOpAnd: public CScaOp
 {

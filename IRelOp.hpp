@@ -43,9 +43,10 @@ class CProject : public IProject {
     vector<Type> colTypes;
     vector<IScalar*> trees;
     IAccessor* outputAccessor;
+    bool projectAgg;
 
     public:
-        CProject(IRelOp& child, vector<string> colNames, vector<Type> colTypes, vector<IScalar*> trees);
+        CProject(IRelOp& child, vector<string> colNames, vector<Type> colTypes, vector<IScalar*> trees, bool projectAgg);
         virtual vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* getChildren();
         virtual void Op(vector<IVariable*>& params);
         virtual IAccessor* Value();
@@ -110,3 +111,4 @@ class CMergeJoin : public IJoin {
         virtual void Op(vector<IVariable*>& params);
         virtual IAccessor* Value();
 };
+

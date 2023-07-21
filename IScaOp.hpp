@@ -27,6 +27,8 @@ class IVariable:public IScalar {
         virtual void Update(Record* value) = 0;
         virtual void Combine(Record* value) = 0;
         virtual int Comp(IScalar& rhs) = 0;
+
+        virtual Record* getRecord() {return nullptr;};
 };
 
 class IScaOp: public IScalar {
@@ -90,6 +92,30 @@ class CVarRuntime: public IVariable {
         virtual void Op(vector<IVariable*>& params){};
 
         virtual int Comp(IScalar& rhs) {throw("Should never be called");};
+};
+
+class LValue : public IVariable {
+    string name;
+    Type type;
+    Record* value;
+
+    public:
+
+        LValue(Type type, string name, Record* value);
+
+         // Implement IVariable
+        virtual string Name();
+        virtual Type getType();
+        virtual Record Value();
+        virtual void Update(Record* value);
+        virtual void Combine(Record* value);
+
+        virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
+        virtual void Op(vector<IVariable*>& params){};
+
+        virtual int Comp(IScalar& rhs) {throw("Should never be called");};
+        
+        virtual Record* getRecord();
 };
 
 class IntValue: public CConstVal

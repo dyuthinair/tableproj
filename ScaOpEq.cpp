@@ -385,6 +385,38 @@ int ScaOpComp::normalizeEval(int difference) {
     }
 }
 
+ScaOpAssign::ScaOpAssign(LValue *val1, IScalar *val2) 
+ : val1(val1), val2(val2)
+{
+    eval = val1;
+}
+
+void ScaOpAssign::Op(vector<IVariable*>& params)
+{
+    ITracer::GetTracer()->Trace("ScaOpAssign::Op called \n");
+    val1->getRecord()->copy(val2->Value());
+}
+
+Record ScaOpAssign::Value() {
+    return eval->Value();
+}
+
+Type ScaOpAssign::getType() {
+    if(val1->getType() == val2->getType()) {
+        return val1->getType();
+    } else {
+        throw("Type mismatch");
+    }
+}
+
+vector<IJob<IScalar, Record, vector<IVariable*>>*>* ScaOpAssign::getChildren() {
+    vector<IJob*>* children = new vector<IJob*>();
+    children->push_back(val1);
+    children->push_back(val2);
+    return children;
+}
+
+
 /*
 
 ScaOpAnd::ScaOpAnd(IScalar *val1, IScalar *val2) 

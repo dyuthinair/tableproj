@@ -10,13 +10,14 @@
 #include <memory>
 
 CProject::CProject(IRelOp& child, vector<string> colNames, vector<Type> colTypes, 
-                    vector<IScalar*> trees) {
+                    vector<IScalar*> trees, bool projectAgg) {
     this->children.push_back(&child);
     this->childJobs.assign(children.begin(), children.end());
     this->colNames = colNames;
     this->colTypes = colTypes;
     this->trees = trees;
     outputAccessor = nullptr;
+    this->projectAgg = projectAgg;
 }
 
 
@@ -38,9 +39,16 @@ void CProject::Op(vector<IVariable*>& params) {
         indices[curType]++;
     }
 
+    Record* prevRecord = nullptr;
+
     while(true) {
+        Record* output = new Record();
+
         Record *curRecord = inputAccessor.getNextRecord();
         if(curRecord == nullptr) {
+            if(projectAgg && prevRecord != nullptr) {  
+                writeAccessor.pushRow(prevRecord);
+            } 
             break;
         }
         for(CVarRuntimeUsingRecord* param: runtimeParams) {
@@ -50,7 +58,7 @@ void CProject::Op(vector<IVariable*>& params) {
         varParams.assign(runtimeParams.begin(), runtimeParams.end());
         
         JobEval<IScalar, Record, vector<IVariable*>>* evaluator = new JobEval<IScalar, Record, vector<IVariable*>>();
-        Record* output = new Record();
+        
         for(IScalar* tree : trees) {
             Record curEval = evaluator->evalTree(tree, varParams);
             if(!curEval.strings.empty()) {
@@ -67,9 +75,14 @@ void CProject::Op(vector<IVariable*>& params) {
                 ITracer::GetTracer()->Trace("Boolean added: %s\n", curEval.booleans.at(0) ? "true" : "false");
             } else {
                 throw ("Scalar evaluation not done properly");
-            }
+            }            
         }
-        writeAccessor.pushRow(output);
+        if(!projectAgg) { 
+            writeAccessor.pushRow(output);                 
+        } else {
+            prevRecord = output;
+        }
+        
     }
     
     this->outputAccessor = &outputTable->getAccessor();

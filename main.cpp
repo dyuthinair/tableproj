@@ -30,6 +30,7 @@ void sortTest();
 void TestComp();
 void mergeJoinTest();
 void mergeJoinTestLarge();
+void countTest();
 
 //bool TestBoolScaOpTree();
 
@@ -56,7 +57,8 @@ void UnitTests(int argc, char* argv[])
     //sortTest();
     //TestComp();
     //mergeJoinTest();
-    mergeJoinTestLarge();
+    //mergeJoinTestLarge(); //alter deserialize to fix
+    countTest();
 
     //std::cout << std::boolalpha << TestBoolScaOpTree();
 }
@@ -142,7 +144,7 @@ void projectTest()
     colTypes.push_back(Float);
     vector<IScalar*> trees;
     trees.push_back(addNode);
-    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees);
+    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees, false);
     JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
@@ -175,7 +177,7 @@ void project2Test()
     trees.push_back(nameNode);
     trees.push_back(addNode);
     trees.push_back(addNode2);
-    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees);
+    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees, false);
     JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
@@ -204,7 +206,7 @@ void subTest()
     vector<IScalar*> trees;
     trees.push_back(nameNode);
     trees.push_back(subNode);
-    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees);
+    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees, false);
     JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
@@ -266,7 +268,7 @@ void ftoiTest()
     vector<IScalar*> trees;
     trees.push_back(nameNode);
     trees.push_back(ftoi);
-    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees);
+    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees, false);
     JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
@@ -299,7 +301,7 @@ void selectThenProject() {
     vector<IScalar*> trees;
     trees.push_back(nameNode);
     trees.push_back(ftoi);
-    CProject *projector = new CProject(*selecter, colNames, colTypes, trees);
+    CProject *projector = new CProject(*selecter, colNames, colTypes, trees, false);
 
     JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
     vector<IVariable*> params;
@@ -453,40 +455,37 @@ void mergeJoinTestLarge()
     serializer->serialize(writeFilePath, *(tree->evalTree(joiner, params)));
 }
 
-/*
-void joinSortTest()
-{
-    string readFilePath1 = "..\\testdata\\oscar_age_female.csv";
-    string readFilePath2 = "..\\testdata\\oscar_age_male.csv";
-    string writeFilePath = "..\\testdata\\oscars_per_year.csv";
+void countTest() {
+    string readFilePath = "..\\testdata\\annual-enterprise-survey-2021-financial-year-provisional-csv.csv";
+    string writeFilePath = "..\\testdata\\info_by_industry.csv";
 
-    CMemTable *tableW = new CMemTable("Women");
-    CCSVDeserializer *deserializerW = new CCSVDeserializer();
-    CMemWriteAccessor writeAccessorW = tableW->getWriteAccessor();
-    deserializerW->deserialize(readFilePath1, writeAccessorW);
+    unique_ptr<CMemTable> table(new CMemTable("Without Size Bands"));
+    CCSVDeserializer *deserializer = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessor = table->getWriteAccessor();
+    deserializer->deserialize(readFilePath, writeAccessor);
 
-    CMemTable *tableM = new CMemTable("Men");
-    CCSVDeserializer *deserializerM = new CCSVDeserializer();
-    CMemWriteAccessor writeAccessorM = tableM->getWriteAccessor();
-    deserializerM->deserialize(readFilePath2, writeAccessorM);
+    LValue *count = new LValue(Int, "Count", new IntValue(0));
+    ScaOpAdd *adder = new ScaOpAdd(count, new IntValue(1));
+    ScaOpAssign *assigner = new ScaOpAssign(count, adder);
 
-    ScaOpEq *eqNode = new ScaOpEq(new CVarRef(Int, "Year", "Women"), new CVarRef(Int, "Year", "Men"));
-    CMemReadAccessor readAccessorW = tableW->getAccessor();
-    CMemReadAccessor readAccessorM = tableM->getAccessor();
-    AccessorRelOp* accessorRelOpW = new AccessorRelOp(readAccessorW);
-    AccessorRelOp* accessorRelOpM = new AccessorRelOp(readAccessorM);
+    CMemReadAccessor readAccessor = table->getAccessor();
+    AccessorRelOp* accessorRelOp = new AccessorRelOp(readAccessor);
 
-    vector<IVariable*> params;
-    CInnerJoin* joiner = new CInnerJoin(*accessorRelOpW, *accessorRelOpM, eqNode);
+    vector<string> colNames;
+    colNames.push_back("Count");
+    vector<Type> colTypes;
+    colTypes.push_back(Int);
+    vector<IScalar*> trees;
+    trees.push_back(assigner);
 
-    ScaOpComp *comparer = new ScaOpComp(new CVarRef(Int, "Year", ""));
-    CSortRelOp* sorter = new CSortRelOp(joiner, comparer);
+    CProject *projector = new CProject(*accessorRelOp, colNames, colTypes, trees, true);
 
     JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
-
+    vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(tree->evalTree(sorter, params)));
-}*/
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
+}
+
 
 /*
 bool TestBoolScaOpTree()
