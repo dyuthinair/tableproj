@@ -14,7 +14,7 @@ using namespace std;
 class CCSVDeserializer {
 
     void initMap();
-    
+    void insert (Type type, Record* prow, string value);
 
     public:
         CCSVDeserializer();

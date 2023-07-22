@@ -9,7 +9,7 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
-
+#include "Tokenizer.hpp"
 
 using namespace std;
 
@@ -40,63 +40,22 @@ void CCSVDeserializer::deserialize(string path, IWriteAccessor &tableWriter) {
     bool isFirstRow = true;
     while (std::getline(myfile, line))
     {
-        std::stringstream iss(line);
         Record* prow = !isFirstRow ? new Record() : nullptr;
-        int col = 0;
-        while (iss.good())
+        Tokenizer tokenizer(line);
+        int col=0;
+        while(tokenizer.HasMore())
         {
-            string substr;
-            getline(iss, substr, ',');
-            substr.erase(remove(substr.begin(), substr.end(), '"'), substr.end());
-            if (isFirstRow)
-            {
-                for(std::string::iterator it=substr.begin(); it != substr.end(); it++)
-                {
-                    if (*it==':')
-                    {
-                        string name = std::string(substr.begin(), it);
-                        trim(name);
-                        colNames.push_back(name);
-                        string typeName  = std::string(it+1, substr.end());
-                        trim(typeName);
-                        Type type = enumMap.at(typeName);
-                        colTypes.push_back(type);
-                        break;
-                    }
-                }
-                col++;
-            }
-            else
-            {
+            if (isFirstRow) {
+                string name = tokenizer.GetToken();
+                colNames.push_back(name);
+                string type = tokenizer.GetToken();
+                colTypes.push_back(enumMap.at(type));
+            } else {
+                string token = tokenizer.GetToken();
                 Type type = colTypes[col];
-                switch(type)
-                {
-                    case String: 
-                        prow->strings.push_back(substr);
-                        break;
-                    case Int: 
-                        prow->nums.push_back(atoi(substr.c_str()));
-                        break;
-                    case Float: 
-                        prow->floats.push_back(atof(substr.c_str()));
-                        break;
-                    case Boolean: 
-                        bool val;
-                        if(substr.compare("True") == 0 || substr.compare("true") == 0) {
-                            val = true;
-                        } else if(substr.compare("False") == 0 || substr.compare("false") == 0){
-                            val = false;
-                        } else {
-                            throw("Invalid boolean value");
-                        }
-                        prow->booleans.push_back(val);
-                        break;
-                    case EnumCount:
-                        throw("Invalid type");
-                        break;
-                }
-                col++;
+                insert(type, prow, token);
             }
+            col++;
         }
         if(isFirstRow) {
             isFirstRow = false;
@@ -105,6 +64,36 @@ void CCSVDeserializer::deserialize(string path, IWriteAccessor &tableWriter) {
         } else {
             tableWriter.pushRow(prow);
         }
+
     }
     myfile.close();
+}
+
+void CCSVDeserializer::insert (Type type, Record* prow, string value) {
+    switch(type)
+    {
+        case String: 
+            prow->strings.push_back(value);
+            break;
+        case Int: 
+            prow->nums.push_back(atoi(value.c_str()));
+            break;
+        case Float: 
+            prow->floats.push_back(atof(value.c_str()));
+            break;
+        case Boolean: 
+            bool val;
+            if(value.compare("True") == 0 || value.compare("true") == 0) {
+                val = true;
+            } else if(value.compare("False") == 0 || value.compare("false") == 0){
+                val = false;
+            } else {
+                throw("Invalid boolean value");
+            }
+            prow->booleans.push_back(val);
+            break;
+        case EnumCount:
+            throw("Invalid type");
+            break;
+    }
 }

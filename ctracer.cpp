@@ -10,7 +10,7 @@
 using namespace std;
 
 ITracer* ITracer::globalTracer = nullptr;
-int ITracer::traceLevel = 1;
+int ITracer::traceLevel = 0;
 
 void CTracer::Trace(const char *fmt, ...)
 {
