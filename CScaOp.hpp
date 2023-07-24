@@ -114,12 +114,12 @@ class ScaOpComp: public CScaOp
 
 class ScaOpAssign: public CScaOp
 {
-    LValue *eval;
-    LValue *val1;
+    ILValue *eval;
+    ILValue *val1;
     IScalar *val2;
 
     public:
-        ScaOpAssign(LValue *val1, IScalar *val2);
+        ScaOpAssign(ILValue *val1, IScalar *val2);
         void Op(vector<IVariable*>& params);
         Record Value();
         Type getType();

@@ -32,6 +32,7 @@ void mergeJoinTest();
 void mergeJoinTestLarge();
 void countTest();
 void sumTest();
+void groupByTest();
 
 //bool TestBoolScaOpTree();
 
@@ -60,7 +61,8 @@ void UnitTests(int argc, char* argv[])
     //mergeJoinTest();
     //mergeJoinTestLarge(); //alter deserialize to fix
     //countTest();
-    sumTest();
+    //sumTest();
+    groupByTest();
 
     //std::cout << std::boolalpha << TestBoolScaOpTree();
 }
@@ -513,6 +515,51 @@ void sumTest() {
     trees.push_back(assigner);
 
     CProject *projector = new CProject(*accessorRelOp, colNames, colTypes, trees, true);
+
+    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    vector<IVariable*> params;
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
+}
+
+void groupByTest() {
+    string readFilePath = "..\\testdata\\annual-enterprise-survey-2021-financial-year-provisional-csv.csv";
+    string writeFilePath = "..\\testdata\\count_by_industry.csv";
+
+    unique_ptr<CMemTable> table(new CMemTable("Without Size Bands"));
+    CCSVDeserializer *deserializer = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessor = table->getWriteAccessor();
+    deserializer->deserialize(readFilePath, writeAccessor);
+
+
+    vector<CVarRef*> groupbyCols;
+    CVarRef *industry = new CVarRef(String, "Industry_name_NZSIOC");
+    CVarRef *units = new CVarRef(String, "Units");
+    groupbyCols.push_back(industry);
+    groupbyCols.push_back(units);
+
+    ILValue *count = new MultiLValue(Int, "Value", groupbyCols);
+    CVarRef *val = new CVarRef(Int, "Value"); 
+    ScaOpAdd *adder = new ScaOpAdd(count, val);
+    ScaOpAssign *assigner = new ScaOpAssign(count, adder);
+
+    CMemReadAccessor readAccessor = table->getAccessor();
+    AccessorRelOp* accessorRelOp = new AccessorRelOp(readAccessor);
+
+    vector<string> colNames;
+    colNames.push_back("Agency");
+    colNames.push_back("Units");
+    colNames.push_back("Sum");
+    vector<Type> colTypes;
+    colTypes.push_back(String);
+    colTypes.push_back(String);
+    colTypes.push_back(Int);
+    vector<IScalar*> trees;
+    trees.push_back(industry);
+    trees.push_back(units);
+    trees.push_back(assigner);
+
+    CProject *projector = new CProject(*accessorRelOp, colNames, colTypes, trees, false);
 
     JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
     vector<IVariable*> params;

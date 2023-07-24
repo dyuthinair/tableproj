@@ -385,7 +385,7 @@ int ScaOpComp::normalizeEval(int difference) {
     }
 }
 
-ScaOpAssign::ScaOpAssign(LValue *val1, IScalar *val2) 
+ScaOpAssign::ScaOpAssign(ILValue *val1, IScalar *val2) 
  : val1(val1), val2(val2)
 {
     eval = val1;

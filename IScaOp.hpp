@@ -7,6 +7,9 @@
 
 #include "IAccessor.hpp"
 #include "IJob.hpp"
+
+#include <unordered_map>
+
 using namespace std;
 
 class IVariable;
@@ -94,7 +97,29 @@ class CVarRuntime: public IVariable {
         virtual int Comp(IScalar& rhs) {throw("Should never be called");};
 };
 
-class LValue : public IVariable {
+class ILValue : public IVariable {
+    string name;
+    Type type;
+    Record* value;
+
+    public:
+
+         // Implement IVariable
+        virtual string Name() = 0;
+        virtual Type getType() = 0;
+        virtual Record Value() = 0;
+        virtual void Update(Record* value) = 0;
+        virtual void Combine(Record* value) = 0;
+
+        virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() = 0;
+        virtual void Op(vector<IVariable*>& params) = 0;
+
+        virtual int Comp(IScalar& rhs) = 0;
+        
+        virtual Record* getRecord() = 0;
+};
+
+class LValue : public ILValue {
     string name;
     Type type;
     Record* value;
@@ -111,6 +136,35 @@ class LValue : public IVariable {
         virtual void Combine(Record* value);
 
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
+        virtual void Op(vector<IVariable*>& params){};
+
+        virtual int Comp(IScalar& rhs) {throw("Should never be called");};
+        
+        virtual Record* getRecord();
+};
+
+class MultiLValue : public ILValue {
+    string name;
+    Type type;
+    vector<CVarRef*> groupByCols;
+    
+    
+    unordered_map<string, Record*> hashedRecords;
+
+    Record* find();
+
+    public:
+
+        MultiLValue(Type type, string name, vector<CVarRef*> groupByCols);
+
+         // Implement IVariable
+        virtual string Name();
+        virtual Type getType();
+        virtual Record Value();
+        virtual void Update(Record* value) {throw("Cannot update MultiLValue");};
+        virtual void Combine(Record* value);
+
+        virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren();
         virtual void Op(vector<IVariable*>& params){};
 
         virtual int Comp(IScalar& rhs) {throw("Should never be called");};
