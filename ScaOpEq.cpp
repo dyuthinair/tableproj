@@ -394,7 +394,8 @@ ScaOpAssign::ScaOpAssign(ILValue *val1, IScalar *val2)
 void ScaOpAssign::Op(vector<IVariable*>& params)
 {
     ITracer::GetTracer()->Trace("ScaOpAssign::Op called \n");
-    val1->getRecord()->copy(val2->Value());
+    Record rec = val2->Value();
+    val1->Update(&rec);
 }
 
 Record ScaOpAssign::Value() {

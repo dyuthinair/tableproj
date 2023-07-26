@@ -59,10 +59,10 @@ void UnitTests(int argc, char* argv[])
     //sortTest();
     //TestComp();
     //mergeJoinTest();
-    //mergeJoinTestLarge(); //alter deserialize to fix
+    //mergeJoinTestLarge(); 
     //countTest();
-    //sumTest();
-    groupByTest();
+    sumTest();
+    //groupByTest();
 
     //std::cout << std::boolalpha << TestBoolScaOpTree();
 }

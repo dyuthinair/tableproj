@@ -24,12 +24,12 @@ Record MultiLValue::Value() {
     return *(find());
 }
 
-void MultiLValue::Combine(Record* value) {
-    throw("How to combine LValue?");
+void MultiLValue::Update(Record* value) {
+    find()->copy(*value);
 }
 
-Record* MultiLValue::getRecord() {
-    return find();
+void MultiLValue::Combine(Record* value) {
+    throw("How to combine LValue?");
 }
 
 vector<IJob<IScalar, Record, vector<IVariable*>>*>* MultiLValue::getChildren() {

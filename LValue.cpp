@@ -32,6 +32,3 @@ void LValue::Combine(Record* value) {
     throw("How to combine LValue?");
 }
 
-Record* LValue::getRecord() {
-    return value;
-}

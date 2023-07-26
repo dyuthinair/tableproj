@@ -21,7 +21,7 @@ vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* CMergeJoin::getChildren()
 }
 
 void CMergeJoin::Op(vector<IVariable*>& params) {
-    ITracer::GetTracer()->Trace("CJoin::Op Called\n");
+    ITracer::GetTracer()->Trace("CMergeJoin::Op Called\n");
 
     unique_ptr<CMemTable> outputTable(new CMemTable());
     IWriteAccessor& writeAccessor = outputTable->getWriteAccessor();

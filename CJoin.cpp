@@ -18,7 +18,7 @@ vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* CInnerJoin::getChildren()
 }
 
 void CInnerJoin::Op(vector<IVariable*>& params) {
-    ITracer::GetTracer()->Trace("CJoin::Op Called\n");
+    ITracer::GetTracer()->Trace("CInnerJoin::Op Called\n");
 
     unique_ptr<CMemTable> outputTable(new CMemTable());
     IWriteAccessor& writeAccessor = outputTable->getWriteAccessor();
