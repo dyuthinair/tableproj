@@ -115,8 +115,6 @@ class ILValue : public IVariable {
         virtual void Op(vector<IVariable*>& params) = 0;
 
         virtual int Comp(IScalar& rhs) = 0;
-        
-        virtual Record* getRecord() = 0;
 };
 
 class LValue : public ILValue {
@@ -139,8 +137,6 @@ class LValue : public ILValue {
         virtual void Op(vector<IVariable*>& params){};
 
         virtual int Comp(IScalar& rhs) {throw("Should never be called");};
-        
-        virtual Record* getRecord();
 };
 
 class MultiLValue : public ILValue {
@@ -161,15 +157,13 @@ class MultiLValue : public ILValue {
         virtual string Name();
         virtual Type getType();
         virtual Record Value();
-        virtual void Update(Record* value) {throw("Cannot update MultiLValue");};
+        virtual void Update(Record* value);
         virtual void Combine(Record* value);
 
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren();
         virtual void Op(vector<IVariable*>& params){};
 
         virtual int Comp(IScalar& rhs) {throw("Should never be called");};
-        
-        virtual Record* getRecord();
 };
 
 class IntValue: public CConstVal
