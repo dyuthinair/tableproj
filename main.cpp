@@ -61,8 +61,8 @@ void UnitTests(int argc, char* argv[])
     //mergeJoinTest();
     //mergeJoinTestLarge(); 
     //countTest();
-    sumTest();
-    //groupByTest();
+    //sumTest();
+    groupByTest();
 
     //std::cout << std::boolalpha << TestBoolScaOpTree();
 }

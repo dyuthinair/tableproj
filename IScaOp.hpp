@@ -7,6 +7,7 @@
 
 #include "IAccessor.hpp"
 #include "IJob.hpp"
+#include "ValuePOD.cpp"
 
 #include <unordered_map>
 
@@ -27,15 +28,12 @@ class IVariable:public IScalar {
         virtual string Name() = 0;
         virtual Type getType() = 0;
         virtual Record Value() = 0;
-        virtual void Update(Record* value) = 0;
+        virtual void Update(const Record& value) = 0;
         virtual void Combine(Record* value) = 0;
         virtual int Comp(IScalar& rhs) = 0;
-
-        virtual Record* getRecord() {return nullptr;};
 };
 
 class IScaOp: public IScalar {
-    public:
 
 };
 
@@ -54,7 +52,7 @@ class CConstVal: public IScalar, public Record {
 class CVarRef: public IVariable {
     string name;
     Type type;
-    Record* value;
+    ValuePOD result;
     int index;
 
     public:
@@ -65,7 +63,7 @@ class CVarRef: public IVariable {
         virtual string Name();
         virtual Type getType();
         virtual Record Value();
-        virtual void Update(Record* value);
+        virtual void Update(const Record& value);
         virtual void Combine(Record* value);
 
         // Implement IScalar
@@ -78,7 +76,7 @@ class CVarRef: public IVariable {
 class CVarRuntime: public IVariable {
     string name;
     Type type;
-    Record* value;
+    ValuePOD result;
 
     public:
         CVarRuntime(Type type, string name, Record* value);
@@ -88,7 +86,7 @@ class CVarRuntime: public IVariable {
         virtual string Name();
         virtual Type getType();
         virtual Record Value();
-        virtual void Update(Record* value);
+        virtual void Update(const Record& value);
         virtual void Combine(Record* value);
 
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
@@ -100,7 +98,7 @@ class CVarRuntime: public IVariable {
 class ILValue : public IVariable {
     string name;
     Type type;
-    Record* value;
+    ValuePOD result;
 
     public:
 
@@ -108,7 +106,7 @@ class ILValue : public IVariable {
         virtual string Name() = 0;
         virtual Type getType() = 0;
         virtual Record Value() = 0;
-        virtual void Update(Record* value) = 0;
+        virtual void Update(const Record& value) = 0;
         virtual void Combine(Record* value) = 0;
 
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() = 0;
@@ -120,7 +118,7 @@ class ILValue : public IVariable {
 class LValue : public ILValue {
     string name;
     Type type;
-    Record* value;
+    ValuePOD result;
 
     public:
 
@@ -130,7 +128,7 @@ class LValue : public ILValue {
         virtual string Name();
         virtual Type getType();
         virtual Record Value();
-        virtual void Update(Record* value);
+        virtual void Update(const Record& value);
         virtual void Combine(Record* value);
 
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
@@ -144,9 +142,10 @@ class MultiLValue : public ILValue {
     Type type;
     vector<CVarRef*> groupByCols;
     
-    
     unordered_map<string, Record*> hashedRecords;
 
+    ValuePOD result;
+    
     Record* find();
 
     public:
@@ -157,7 +156,7 @@ class MultiLValue : public ILValue {
         virtual string Name();
         virtual Type getType();
         virtual Record Value();
-        virtual void Update(Record* value);
+        virtual void Update(const Record& value);
         virtual void Combine(Record* value);
 
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren();
@@ -275,7 +274,7 @@ class CRecordColumn:public IScalar {
         virtual Type getType();
         virtual Record Value();
         virtual void Op(vector<IVariable*> &variables);
-        virtual void Update(Record* value);
+        virtual void Update(const Record& value);
         virtual int Comp(IScalar& rhs);
 
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};

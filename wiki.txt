@@ -50,8 +50,13 @@ ISortRelOp
 IAggRelOp
 
 
+copy constructor
+operator overload
 
 
+vtable
+code segments
+data segements
 
 
 

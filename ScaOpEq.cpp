@@ -10,7 +10,7 @@ using namespace std;
 ScaOpEq::ScaOpEq(IScalar *val1, IScalar *val2) 
  : val1(val1), val2(val2)
 {
-    
+
 }
 
 void ScaOpEq::Op(vector<IVariable*>& params) {
@@ -394,8 +394,7 @@ ScaOpAssign::ScaOpAssign(ILValue *val1, IScalar *val2)
 void ScaOpAssign::Op(vector<IVariable*>& params)
 {
     ITracer::GetTracer()->Trace("ScaOpAssign::Op called \n");
-    Record rec = val2->Value();
-    val1->Update(&rec);
+    val1->Update(val2->Value());
 }
 
 Record ScaOpAssign::Value() {

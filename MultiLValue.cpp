@@ -10,6 +10,7 @@ MultiLValue::MultiLValue(Type type, string name, vector<CVarRef*> groupByCols) {
     this->type = type;
     this->name = name;
     this->groupByCols = groupByCols;
+    //result.nextRow = &hashedRecords.begin();
 }
 
 Type MultiLValue::getType() {
@@ -24,8 +25,8 @@ Record MultiLValue::Value() {
     return *(find());
 }
 
-void MultiLValue::Update(Record* value) {
-    find()->copy(*value);
+void MultiLValue::Update(const Record& value) {
+    find()->copy(value);
 }
 
 void MultiLValue::Combine(Record* value) {

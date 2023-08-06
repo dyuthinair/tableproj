@@ -12,7 +12,6 @@ using namespace std;
 class CVarRuntimeUsingRecord: public CVarRuntime {
     string name;
     Type type;
-    Record* prow;
     Record returnValue;
     int col;
 
@@ -22,6 +21,6 @@ class CVarRuntimeUsingRecord: public CVarRuntime {
         virtual Record Value();
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
         virtual void Op(vector<IVariable*>& params){};
-        virtual void Update(Record* value);
+        virtual void Update(const Record& value);
         virtual void Combine(Record* value);
 };

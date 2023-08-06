@@ -9,7 +9,7 @@
 LValue::LValue(Type type, string name, Record* value) {
     this->type = type;
     this->name = name;
-    this->value = value;
+    this->result.ScaValue = value;
 }
 
 Type LValue::getType() {
@@ -21,11 +21,11 @@ string LValue::Name() {
 }
 
 Record LValue::Value() {
-    return *value;
+    return *result.ScaValue;
 }
 
-void LValue::Update(Record* value) {
-    this->value = value;
+void LValue::Update(const Record& value) {
+    result.ScaValue->copy(value);
 }
 
 void LValue::Combine(Record* value) {

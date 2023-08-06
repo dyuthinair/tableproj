@@ -48,7 +48,7 @@ void CSelect::Op(vector<IVariable*>& params) {
             break;
         }
         for(CVarRuntimeUsingRecord* param: runtimeParams) {
-            param->Update(curRecord);
+            param->Update(*curRecord);
         }
         vector<IVariable*> varParams;
         varParams.assign(runtimeParams.begin(), runtimeParams.end());

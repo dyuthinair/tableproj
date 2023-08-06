@@ -79,14 +79,14 @@ int CMergeJoin::EvalCurrentRow(bool updateLeft, bool updateRight, int leftcols, 
     if(updateLeft) {
         for(int paramCol = 0; paramCol < leftcols; paramCol++) { //iterates over first half of the parameters
             CVarRuntimeUsingRecord* param = runtimeParams.at(paramCol);
-            param->Update(left);
+            param->Update(*left);
         } 
     }
 
     if(updateRight) {
         for(int paramCol = leftcols; paramCol < (int) runtimeParams.size(); paramCol++) { //iterates over second half of the parameters
             CVarRuntimeUsingRecord* param = runtimeParams.at(paramCol);
-            param->Update(right);
+            param->Update(*right);
         } 
     }
 

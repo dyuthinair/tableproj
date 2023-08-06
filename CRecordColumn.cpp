@@ -26,7 +26,7 @@ void CRecordColumn::Op(vector<IVariable*> &variables) {
 
 }
 
-void CRecordColumn::Update(Record* value) {
+void CRecordColumn::Update(const Record& value) {
 
 }
 

@@ -20,8 +20,7 @@ CVarRuntimeUsingRecord::CVarRuntimeUsingRecord(Type type, string name, int colum
     this->col = column;
 }
 
-void CVarRuntimeUsingRecord::Update(Record* value) {
-    this->prow = value;
+void CVarRuntimeUsingRecord::Update(const Record& value) {
 
     Type type = getType();
     returnValue.booleans.clear();
@@ -32,16 +31,16 @@ void CVarRuntimeUsingRecord::Update(Record* value) {
     switch(type)
     {
         case String:
-            returnValue.strings.push_back(this->prow->strings.at(this->col));
+            returnValue.strings.push_back(value.strings.at(this->col));
             break;
         case Int:
-            returnValue.nums.push_back(this->prow->nums.at(this->col));
+            returnValue.nums.push_back(value.nums.at(this->col));
             break;
         case Float:
-            returnValue.floats.push_back(this->prow->floats.at(this->col));
+            returnValue.floats.push_back(value.floats.at(this->col));
             break;
         case Boolean: 
-            returnValue.booleans.push_back(this->prow->booleans.at(this->col));
+            returnValue.booleans.push_back(value.booleans.at(this->col));
             break;
         case EnumCount:
             throw("Invalid type");  

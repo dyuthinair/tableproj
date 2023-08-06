@@ -41,14 +41,14 @@ void CInnerJoin::Op(vector<IVariable*>& params) {
     while (nextRecord1 != nullptr) {        
         for(unsigned int paramCol = 0; paramCol < inputAccessor1.getCols(); paramCol++) { //iterates over first half of the parameters
             CVarRuntimeUsingRecord* param = runtimeParams.at(paramCol);
-            param->Update(nextRecord1);
+            param->Update(*nextRecord1);
         }
 
         Record* nextRecord2 = inputAccessor2.getNextRecord();
         while(nextRecord2 != nullptr) {  
             for(unsigned int paramCol = inputAccessor1.getCols(); paramCol < runtimeParams.size(); paramCol++) {
                 CVarRuntimeUsingRecord* param = runtimeParams.at(paramCol);
-                param->Update(nextRecord2);
+                param->Update(*nextRecord2);
             }          
             
             vector<IVariable*> varParams;

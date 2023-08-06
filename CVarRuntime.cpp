@@ -9,13 +9,13 @@
 CVarRuntime::CVarRuntime(Type type, string name, Record* value) {
     this->type = type;
     this->name = name;
-    this->value = value;
+    this->result.ScaValue = value;
 }
 
 CVarRuntime::CVarRuntime(Type type, string name, Record* value, string tableName) {
     this->type = type;
     this->name = tableName + ":" + name;
-    this->value = value;
+    this->result.ScaValue = value;
 }
 
 Type CVarRuntime::getType() {
@@ -27,11 +27,11 @@ string CVarRuntime::Name() {
 }
 
 Record CVarRuntime::Value() {
-    return *value;
+    return *result.ScaValue;
 }
 
-void CVarRuntime::Update(Record* value) {
-    this->value = value;
+void CVarRuntime::Update(const Record& value) {
+    this->result.ScaValue->copy(value);
 }
 
 void CVarRuntime::Combine(Record* value) {

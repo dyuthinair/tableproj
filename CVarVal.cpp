@@ -29,7 +29,7 @@ string CVarRef::Name() {
 }
 
 Record CVarRef::Value() {
-    return *value;
+    return *result.ScaValue;
 }
 
 void CVarRef::Op(vector<IVariable*>& params) {
@@ -39,7 +39,7 @@ void CVarRef::Op(vector<IVariable*>& params) {
             if(curVar->Name().compare(this->name) == 0 && curVar->getType() == this->type) {
                 Record *var = new Record();
                 var->copy(curVar->Value());
-                value = var;
+                result.ScaValue = var;
                 return;
                 //ITracer::GetTracer()->Trace("CVarRef::Op value of %s is %d.\n", curVar->Name().c_str(), value->nums.at(0));
             }
@@ -50,11 +50,11 @@ void CVarRef::Op(vector<IVariable*>& params) {
         IVariable* curVar = params.at(index);
         Record *var = new Record();
         var->copy(curVar->Value());
-        value = var;
+        result.ScaValue = var;
     }
 }
 
-void CVarRef::Update(Record* value)
+void CVarRef::Update(const Record& value)
 {
     throw("Unsupported");
 }
