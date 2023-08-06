@@ -10,5 +10,4 @@
 
 struct ValuePOD {
     Record* ScaValue{nullptr};
-    IAccessor* SetValue{nullptr};
 };

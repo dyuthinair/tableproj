@@ -40,6 +40,8 @@ inline string toString(Type t)
     throw("Unreachable code");
 }
 
+class IAccessor;
+
 class Record
 {
     public:
@@ -47,6 +49,8 @@ class Record
         std::vector<int> nums;
         std::vector<float> floats;
         std::vector<bool> booleans;
+
+        IAccessor* SetValue{nullptr};
 
         bool operator==(const Record &rhs ) {
             return strings == rhs.strings
