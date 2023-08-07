@@ -47,7 +47,21 @@ void CProject::Op(vector<IVariable*>& params) {
         Record *curRecord = inputAccessor.getNextRecord();
         if(curRecord == nullptr) {
             if(projectAgg && prevRecord != nullptr) {  
-                writeAccessor.pushRow(prevRecord);
+                bool hasAccessor = false;
+                for(IScalar* tree : trees) {
+                    IAccessor *hashIterator = tree->Value().SetValue;
+                    if(hashIterator != nullptr) {
+                        hasAccessor = true;
+                        Record *nextRecord = hashIterator->getNextRecord();
+                        while(nextRecord != nullptr) {
+                            writeAccessor.pushRow(nextRecord);
+                            nextRecord = hashIterator->getNextRecord();
+                        }
+                    }
+                }
+                if(!hasAccessor) {
+                    writeAccessor.pushRow(prevRecord);
+                }                
             } 
             break;
         }
@@ -82,9 +96,7 @@ void CProject::Op(vector<IVariable*>& params) {
         } else {
             prevRecord = output;
         }
-        
     }
-    
     this->outputAccessor = &outputTable->getAccessor();
 }
 

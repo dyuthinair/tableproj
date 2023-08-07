@@ -8,6 +8,7 @@
 #include "IAccessor.hpp"
 #include "IJob.hpp"
 #include "ValuePOD.cpp"
+#include "TableHashMap.hpp"
 
 #include <unordered_map>
 
@@ -141,9 +142,7 @@ class MultiLValue : public ILValue {
     string name;
     Type type;
     vector<CVarRef*> groupByCols;
-    
-    unordered_map<string, Record*> hashedRecords;
-
+    TableHashMap *hashedRecords;
     ValuePOD result;
     
     Record* find();

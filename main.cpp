@@ -36,9 +36,22 @@ void groupByTest();
 
 //bool TestBoolScaOpTree();
 
+#include <stdexcept>
+#include <exception>
+#include <typeinfo>
+
+
 int main(int argc, char* argv[])
 {
-    UnitTests(argc, argv);
+    try
+    {
+        UnitTests(argc, argv);
+    }
+    catch(const std::exception& e)
+    {
+        std::cout << "unhandled exception!!!";
+        cout << e.what() << endl;
+    }
 }
 
 void UnitTests(int argc, char* argv[])
@@ -559,7 +572,7 @@ void groupByTest() {
     trees.push_back(units);
     trees.push_back(assigner);
 
-    CProject *projector = new CProject(*accessorRelOp, colNames, colTypes, trees, false);
+    CProject *projector = new CProject(*accessorRelOp, colNames, colTypes, trees, true);
 
     JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
     vector<IVariable*> params;

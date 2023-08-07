@@ -4,13 +4,24 @@
 /*                                               */
 /*************************************************/
 #include "IScaOp.hpp"
+#include "CHashTableAccessor.hpp"
 
 
 MultiLValue::MultiLValue(Type type, string name, vector<CVarRef*> groupByCols) {
     this->type = type;
     this->name = name;
     this->groupByCols = groupByCols;
-    //result.nextRow = &hashedRecords.begin();
+
+    vector<string> colNames;
+    vector<Type> colTypes;
+
+    for(CVarRef* curRef : groupByCols) {
+        colNames.push_back(curRef->Name());
+        colTypes.push_back(curRef->getType());
+    }
+    colNames.push_back(name);
+    colTypes.push_back(type);
+    hashedRecords = new TableHashMap(&colNames, &colTypes);
 }
 
 Type MultiLValue::getType() {
@@ -22,11 +33,30 @@ string MultiLValue::Name() {
 }
 
 Record MultiLValue::Value() {
-    return *(find());
+    Record* foundVal = find();
+    foundVal->SetValue = new CHashTableAccessor(*hashedRecords);
+    return *foundVal;
 }
 
 void MultiLValue::Update(const Record& value) {
-    find()->copy(value);
+    Record* toBeUpdated = find();
+    switch(type) {
+        case String:   
+            toBeUpdated->strings.at(0) = value.strings.at(0);
+            break;
+        case Int:   
+            toBeUpdated->nums.at(0) = value.nums.at(0);
+            break;
+        case Float: 
+            toBeUpdated->floats.at(0) = value.floats.at(0);
+            break;
+        case Boolean: 
+            toBeUpdated->booleans.at(0) = value.booleans.at(0);
+            break;
+        case EnumCount: 
+            throw("Not a real type");
+            break;
+    }    
 }
 
 void MultiLValue::Combine(Record* value) {
@@ -62,8 +92,30 @@ Record* MultiLValue::find() {
                 break;
         }
     }
-    if(hashedRecords.count(colKey) == 0) {
-        hashedRecords.insert({colKey, new IntValue(0)});
+    if(!hashedRecords->contains(colKey)) {
+        Record *recWithCols = new Record();
+        recWithCols->nums.push_back(0);
+        for(CVarRef *col: groupByCols) {
+            Type colType = col->getType();
+            switch(colType) {
+                case String:
+                    recWithCols->strings.push_back(col->Value().strings.at(0));
+                    break;
+                case Int:
+                    recWithCols->nums.push_back(col->Value().nums.at(0));
+                    break;
+                case Float:
+                    throw("Cannot group by on floats");
+                case Boolean: 
+                    recWithCols->booleans.push_back(col->Value().booleans.at(0));
+                    break;
+                case EnumCount:
+                    throw("Invalid type");  
+                    break;
+            }
+        }
+        recWithCols->nums.push_back(0);
+        hashedRecords->insert(colKey, recWithCols);
     } 
-    return hashedRecords.at(colKey);
+    return hashedRecords->value(colKey);
 }

@@ -80,6 +80,7 @@ class Record
             for(bool boolean : rec.booleans) {
                 this->booleans.push_back(boolean);
             }
+            this->SetValue = rec.SetValue;
         }
 };
 
