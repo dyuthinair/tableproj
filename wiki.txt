@@ -58,6 +58,9 @@ vtable
 code segments
 data segements
 
+const methods and objects
 
+p *(nextRecord->strings._M_impl._M_start)@2
 
+set print object on
 
