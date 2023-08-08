@@ -10,10 +10,10 @@ CInnerJoin::CInnerJoin(IRelOp& child1, IRelOp& child2, IScalar* tree) {
     this->children.push_back(&child2);
     this->childJobs.assign(children.begin(), children.end());
     this->tree = tree;
-    outputAccessor = nullptr;
+    producedAccessors = new vector<IAccessor*>();
 }
 
-vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* CInnerJoin::getChildren() {
+vector<IJob<IRelOp, vector<IAccessor*>*, vector<IVariable*>>*>* CInnerJoin::getChildren() {
     return &childJobs;
 }
 
@@ -23,8 +23,8 @@ void CInnerJoin::Op(vector<IVariable*>& params) {
     unique_ptr<CMemTable> outputTable(new CMemTable());
     IWriteAccessor& writeAccessor = outputTable->getWriteAccessor();
     
-    IAccessor& inputAccessor1 = *children.at(0)->Value();
-    IAccessor& inputAccessor2 = *children.at(1)->Value();
+    IAccessor& inputAccessor1 = *children.at(0)->Value()->at(0);
+    IAccessor& inputAccessor2 = *children.at(1)->Value()->at(0);
 
     vector<string> outputNames;
     vector<Type> outputTypes;
@@ -69,8 +69,7 @@ void CInnerJoin::Op(vector<IVariable*>& params) {
         } 
         nextRecord1 = inputAccessor1.getNextRecord();
     }
-    
-    this->outputAccessor = &outputTable->getAccessor();
+    producedAccessors->push_back(&outputTable->getAccessor());
 }
 
 void CInnerJoin::CollectMetadata(IAccessor& accessor, 
@@ -112,7 +111,7 @@ void CInnerJoin::CollectMetadata(IAccessor& accessor,
     }
 }
 
-IAccessor* CInnerJoin::Value() {
-    return outputAccessor;
+vector<IAccessor*>* CInnerJoin::Value() {
+    return producedAccessors;
 }
 

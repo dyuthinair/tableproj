@@ -13,7 +13,7 @@ CSelect::CSelect(IRelOp& child, IScalar* tree)
     this->children.push_back(&child);
     this->childJobs.assign(children.begin(), children.end());
     this->tree = tree;
-    outputAccessor = nullptr;
+    producedAccessors = new vector<IAccessor*>();
 }
 
 
@@ -21,7 +21,7 @@ void CSelect::Op(vector<IVariable*>& params) {
 
     ITracer::GetTracer()->Trace("CSelect::Op Called\n");
 
-    IAccessor& inputAccessor = *children.at(0)->Value();
+    IAccessor& inputAccessor = *children.at(0)->Value()->at(0);
     CMemTable *outputTable = new CMemTable();
     IWriteAccessor& writeAccessor = outputTable->getWriteAccessor();
     vector<string> colNames;
@@ -65,14 +65,14 @@ void CSelect::Op(vector<IVariable*>& params) {
         }
         
     }    
-    this->outputAccessor = &outputTable->getAccessor();
+    producedAccessors->push_back(&outputTable->getAccessor());
 }
 
-IAccessor* CSelect::Value() {
-    return outputAccessor;
+vector<IAccessor*>* CSelect::Value() {
+    return producedAccessors;
 }
 
-vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* CSelect::getChildren() {
+vector<IJob<IRelOp, vector<IAccessor*>*, vector<IVariable*>>*>* CSelect::getChildren() {
     ITracer::GetTracer()->Trace("CSelect::getChildren Called\n");
 
     return &childJobs;

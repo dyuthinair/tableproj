@@ -16,15 +16,15 @@ CProject::CProject(IRelOp& child, vector<string> colNames, vector<Type> colTypes
     this->colNames = colNames;
     this->colTypes = colTypes;
     this->trees = trees;
-    outputAccessor = nullptr;
     this->projectAgg = projectAgg;
+    producedAccessors = new vector<IAccessor*>();
 }
 
 
 void CProject::Op(vector<IVariable*>& params) {
     ITracer::GetTracer()->Trace("CProject::Op Called\n");
 
-    IAccessor& inputAccessor = *children.at(0)->Value();
+    IAccessor& inputAccessor = *children.at(0)->Value()->at(0);
     CMemTable *outputTable = new CMemTable();
     IWriteAccessor& writeAccessor = outputTable->getWriteAccessor();
     writeAccessor.setColNames(colNames);
@@ -97,14 +97,15 @@ void CProject::Op(vector<IVariable*>& params) {
             prevRecord = output;
         }
     }
-    this->outputAccessor = &outputTable->getAccessor();
+    producedAccessors->push_back(&outputTable->getAccessor());
+    ITracer::GetTracer()->Trace("CProject::Op Over\n");
 }
 
-IAccessor* CProject::Value() {
-    return outputAccessor;
+vector<IAccessor*>* CProject::Value() {
+    return producedAccessors;
 }
 
-vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* CProject::getChildren() {
+vector<IJob<IRelOp, vector<IAccessor*>*, vector<IVariable*>>*>* CProject::getChildren() {
     ITracer::GetTracer()->Trace("CProject::getChildren Called\n");
 
     return &childJobs;

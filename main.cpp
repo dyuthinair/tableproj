@@ -161,11 +161,11 @@ void projectTest()
     colTypes.push_back(Float);
     vector<IScalar*> trees;
     trees.push_back(addNode);
-    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees, false);
-    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    CProject *projector = new CProject(*new AccessorRelOp(&readAccessor), colNames, colTypes, trees, false);
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)->at(0)));
 }
 
 void project2Test()
@@ -194,11 +194,11 @@ void project2Test()
     trees.push_back(nameNode);
     trees.push_back(addNode);
     trees.push_back(addNode2);
-    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees, false);
-    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    CProject *projector = new CProject(*new AccessorRelOp(&readAccessor), colNames, colTypes, trees, false);
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params))->at(0));
 }
 
 void subTest()
@@ -223,11 +223,11 @@ void subTest()
     vector<IScalar*> trees;
     trees.push_back(nameNode);
     trees.push_back(subNode);
-    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees, false);
-    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    CProject *projector = new CProject(*new AccessorRelOp(&readAccessor), colNames, colTypes, trees, false);
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params))->at(0));
 }
 
 
@@ -243,11 +243,11 @@ void selectTest()
 
     ScaOpGt *gtNode = new ScaOpGt(new CVarRef(Float, "Age"), new FloatValue(25));
     CMemReadAccessor readAccessor = table->getAccessor();
-    CSelect *selecter = new CSelect(*new AccessorRelOp(readAccessor), gtNode);
-    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    CSelect *selecter = new CSelect(*new AccessorRelOp(&readAccessor), gtNode);
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(tree->evalTree(selecter, params)));
+    serializer->serialize(writeFilePath, *(tree->evalTree(selecter, params))->at(0));
 }
 
 bool TestGt()
@@ -285,11 +285,11 @@ void ftoiTest()
     vector<IScalar*> trees;
     trees.push_back(nameNode);
     trees.push_back(ftoi);
-    CProject *projector = new CProject(*new AccessorRelOp(readAccessor), colNames, colTypes, trees, false);
-    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    CProject *projector = new CProject(*new AccessorRelOp(&readAccessor), colNames, colTypes, trees, false);
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params))->at(0));
 }
 
 void selectThenProject() {
@@ -303,7 +303,7 @@ void selectThenProject() {
 
     IScaOp *gtNode = new ScaOpEq(new ScaOpFtoI(new CVarRef(Float, "Age")), new IntValue(24));
     CMemReadAccessor readAccessor = table->getAccessor();
-    AccessorRelOp* accessorRelOp = new AccessorRelOp(readAccessor);
+    AccessorRelOp* accessorRelOp = new AccessorRelOp(&readAccessor);
     CSelect *selecter = new CSelect(*accessorRelOp, gtNode);
 
     ScaOpSub *subNode = new ScaOpSub(new FloatValue(2007), new CVarRef(Float, "Age"));
@@ -320,10 +320,10 @@ void selectThenProject() {
     trees.push_back(ftoi);
     CProject *projector = new CProject(*selecter, colNames, colTypes, trees, false);
 
-    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params))->at(0));
 }
 
 
@@ -346,16 +346,16 @@ void joinTest()
     ScaOpEq *eqNode = new ScaOpEq(new CVarRef(Int, "Year", "Women"), new CVarRef(Int, "Year", "Men"));
     CMemReadAccessor readAccessorW = tableW->getAccessor();
     CMemReadAccessor readAccessorM = tableM->getAccessor();
-    AccessorRelOp* accessorRelOpW = new AccessorRelOp(readAccessorW);
-    AccessorRelOp* accessorRelOpM = new AccessorRelOp(readAccessorM);
+    AccessorRelOp* accessorRelOpW = new AccessorRelOp(&readAccessorW);
+    AccessorRelOp* accessorRelOpM = new AccessorRelOp(&readAccessorM);
 
     vector<IVariable*> params;
     CInnerJoin* joiner = new CInnerJoin(*accessorRelOpW, *accessorRelOpM, eqNode);
 
-    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
 
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(tree->evalTree(joiner, params)));
+    serializer->serialize(writeFilePath, *(tree->evalTree(joiner, params))->at(0));
 }
 
 void sortTest()
@@ -369,13 +369,13 @@ void sortTest()
     deserializer->deserialize(readFilePath, writeAccessor);
 
     CMemReadAccessor readAccessor = table->getAccessor();
-    AccessorRelOp* accessorRelOp = new AccessorRelOp(readAccessor);
+    AccessorRelOp* accessorRelOp = new AccessorRelOp(&readAccessor);
     vector<IVariable*> params;
 
     CSortOp* sorter = new CSortOp(*accessorRelOp, "Name");
-    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(tree->evalTree(sorter, params)));
+    serializer->serialize(writeFilePath, *(tree->evalTree(sorter, params))->at(0));
 }
 
 void TestComp()
@@ -420,8 +420,8 @@ void mergeJoinTest()
     ScaOpComp *compNode = new ScaOpComp(new CVarRef(String, "Movie", "Women"), new CVarRef(String, "Movie", "Men"));
     CMemReadAccessor readAccessorW = tableW->getAccessor();
     CMemReadAccessor readAccessorM = tableM->getAccessor();
-    AccessorRelOp* accessorRelOpW = new AccessorRelOp(readAccessorW);
-    AccessorRelOp* accessorRelOpM = new AccessorRelOp(readAccessorM);
+    AccessorRelOp* accessorRelOpW = new AccessorRelOp(&readAccessorW);
+    AccessorRelOp* accessorRelOpM = new AccessorRelOp(&readAccessorM);
 
     vector<IVariable*> params;
 
@@ -430,10 +430,10 @@ void mergeJoinTest()
 
     CMergeJoin* joiner = new CMergeJoin(*sorterW, *sorterM, compNode);
 
-    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
 
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(tree->evalTree(joiner, params)));
+    serializer->serialize(writeFilePath, *(tree->evalTree(joiner, params))->at(0));
 }
 
 
@@ -456,8 +456,8 @@ void mergeJoinTestLarge()
     ScaOpComp *compNode = new ScaOpComp(new CVarRef(String, "Without Size Bands", "Industry_name_NZSIOC"), new CVarRef(String, "Size Bands", "industry_code_ANZSIC"));
     CMemReadAccessor readAccessorS = tableS->getAccessor();
     CMemReadAccessor readAccessorN = tableN->getAccessor();
-    AccessorRelOp* accessorRelOpS = new AccessorRelOp(readAccessorS);
-    AccessorRelOp* accessorRelOpN = new AccessorRelOp(readAccessorN);
+    AccessorRelOp* accessorRelOpS = new AccessorRelOp(&readAccessorS);
+    AccessorRelOp* accessorRelOpN = new AccessorRelOp(&readAccessorN);
 
     vector<IVariable*> params;
 
@@ -466,10 +466,10 @@ void mergeJoinTestLarge()
 
     CMergeJoin* joiner = new CMergeJoin(*sorterS, *sorterN, compNode);
 
-    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
 
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(tree->evalTree(joiner, params)));
+    serializer->serialize(writeFilePath, *(tree->evalTree(joiner, params))->at(0));
 }
 
 void countTest() {
@@ -486,7 +486,7 @@ void countTest() {
     ScaOpAssign *assigner = new ScaOpAssign(count, adder);
 
     CMemReadAccessor readAccessor = table->getAccessor();
-    AccessorRelOp* accessorRelOp = new AccessorRelOp(readAccessor);
+    AccessorRelOp* accessorRelOp = new AccessorRelOp(&readAccessor);
 
     vector<string> colNames;
     colNames.push_back("Count");
@@ -497,10 +497,10 @@ void countTest() {
 
     CProject *projector = new CProject(*accessorRelOp, colNames, colTypes, trees, true);
 
-    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params))->at(0));
 }
 
 void sumTest() {
@@ -518,7 +518,7 @@ void sumTest() {
     ScaOpAssign *assigner = new ScaOpAssign(count, adder);
 
     CMemReadAccessor readAccessor = table->getAccessor();
-    AccessorRelOp* accessorRelOp = new AccessorRelOp(readAccessor);
+    AccessorRelOp* accessorRelOp = new AccessorRelOp(&readAccessor);
 
     vector<string> colNames;
     colNames.push_back("Sum");
@@ -529,10 +529,10 @@ void sumTest() {
 
     CProject *projector = new CProject(*accessorRelOp, colNames, colTypes, trees, true);
 
-    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params))->at(0));
 }
 
 void groupByTest() {
@@ -557,7 +557,7 @@ void groupByTest() {
     ScaOpAssign *assigner = new ScaOpAssign(count, adder);
 
     CMemReadAccessor readAccessor = table->getAccessor();
-    AccessorRelOp* accessorRelOp = new AccessorRelOp(readAccessor);
+    AccessorRelOp* accessorRelOp = new AccessorRelOp(&readAccessor);
 
     vector<string> colNames;
     colNames.push_back("Agency");
@@ -574,10 +574,10 @@ void groupByTest() {
 
     CProject *projector = new CProject(*accessorRelOp, colNames, colTypes, trees, true);
 
-    JobEval<IRelOp, IAccessor*, vector<IVariable*>>* tree = new JobEval<IRelOp, IAccessor*, vector<IVariable*>>();
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)));
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params))->at(0));
 }
 
 

@@ -25,8 +25,7 @@ R JobEval<IOp, R, Runtime>::evalTree(IJob<IOp, R, Runtime> *root,Runtime& params
                     break;
                 }
             }
-            if(!allChildrenTravered)
-            {
+            if(!allChildrenTravered) {
                 todo.push(cur);
                 for(IJob<IOp, R, Runtime>* child : *children) {
                     todo.push(child);
@@ -38,9 +37,10 @@ R JobEval<IOp, R, Runtime>::evalTree(IJob<IOp, R, Runtime> *root,Runtime& params
             cur->Op(params);
         }  
     } 
+    ITracer::GetTracer()->Trace("JobEval Over\n");
     return root->Value();
 }
 
 template class JobEval<IScalar, Record, vector<IVariable*>>;
-template class JobEval<IRelOp, IAccessor*, vector<IVariable*>>;
+template class JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>;
 

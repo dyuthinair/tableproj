@@ -12,11 +12,11 @@ CMergeJoin::CMergeJoin(IRelOp& child1, IRelOp& child2, IScalar* tree) {
     this->children.push_back(&child2);
     this->childJobs.assign(children.begin(), children.end());
     this->tree = tree;
-    outputAccessor = nullptr;
     evaluator = new JobEval<IScalar, Record, vector<IVariable*>>();
+    producedAccessors = new vector<IAccessor*>();
 }
 
-vector<IJob<IRelOp, IAccessor*, vector<IVariable*>>*>* CMergeJoin::getChildren() {
+vector<IJob<IRelOp, vector<IAccessor*>*, vector<IVariable*>>*>* CMergeJoin::getChildren() {
     return &childJobs;
 }
 
@@ -26,8 +26,8 @@ void CMergeJoin::Op(vector<IVariable*>& params) {
     unique_ptr<CMemTable> outputTable(new CMemTable());
     IWriteAccessor& writeAccessor = outputTable->getWriteAccessor();
     
-    IAccessor& inputAccessor1 = *children.at(0)->Value();
-    IAccessor& inputAccessor2 = *children.at(1)->Value();
+    IAccessor& inputAccessor1 = *children.at(0)->Value()->at(0);
+    IAccessor& inputAccessor2 = *children.at(1)->Value()->at(0);
 
     vector<string> outputNames;
     vector<Type> outputTypes;
@@ -71,7 +71,7 @@ void CMergeJoin::Op(vector<IVariable*>& params) {
         } 
     }
       
-    this->outputAccessor = &outputTable->getAccessor();
+    producedAccessors->push_back(&outputTable->getAccessor());
 }
 
 int CMergeJoin::EvalCurrentRow(bool updateLeft, bool updateRight, int leftcols, Record* left, Record* right, vector<CVarRuntimeUsingRecord*>& runtimeParams)
@@ -159,7 +159,7 @@ void CMergeJoin::CollectMetadata(IAccessor& accessor,
     }
 }
 
-IAccessor* CMergeJoin::Value() {
-    return outputAccessor;
+vector<IAccessor*>* CMergeJoin::Value() {
+    return producedAccessors;
 }
 
