@@ -52,11 +52,7 @@ void CProject::Op(vector<IVariable*>& params) {
                     IAccessor *hashIterator = tree->Value().SetValue;
                     if(hashIterator != nullptr) {
                         hasAccessor = true;
-                        Record *nextRecord = hashIterator->getNextRecord();
-                        while(nextRecord != nullptr) {
-                            writeAccessor.pushRow(nextRecord);
-                            nextRecord = hashIterator->getNextRecord();
-                        }
+                        producedAccessors->push_back(hashIterator);
                     }
                 }
                 if(!hasAccessor) {
@@ -97,7 +93,6 @@ void CProject::Op(vector<IVariable*>& params) {
             prevRecord = output;
         }
     }
-    producedAccessors->push_back(&outputTable->getAccessor());
     ITracer::GetTracer()->Trace("CProject::Op Over\n");
 }
 

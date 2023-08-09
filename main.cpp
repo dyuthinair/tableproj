@@ -33,6 +33,7 @@ void mergeJoinTestLarge();
 void countTest();
 void sumTest();
 void groupByTest();
+void multiGroupByTest();
 
 //bool TestBoolScaOpTree();
 
@@ -75,7 +76,8 @@ void UnitTests(int argc, char* argv[])
     //mergeJoinTestLarge(); 
     //countTest();
     //sumTest();
-    groupByTest();
+    //groupByTest();
+    multiGroupByTest();
 
     //std::cout << std::boolalpha << TestBoolScaOpTree();
 }
@@ -574,10 +576,67 @@ void groupByTest() {
 
     CProject *projector = new CProject(*accessorRelOp, colNames, colTypes, trees, true);
 
+    CMultiGroupBy *grouper = new CMultiGroupBy(*projector);
+
     JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
-    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params))->at(0));
+    serializer->serialize(writeFilePath, *(tree->evalTree(grouper, params))->at(0));
+}
+
+void multiGroupByTest() {
+    string readFilePath = "..\\testdata\\annual-enterprise-survey-2021-financial-year-provisional-csv.csv";
+    string writeFilePath = "..\\testdata\\count_by_industry.csv";
+
+    unique_ptr<CMemTable> table(new CMemTable("Without Size Bands"));
+    CCSVDeserializer *deserializer = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessor = table->getWriteAccessor();
+    deserializer->deserialize(readFilePath, writeAccessor);
+
+
+    vector<CVarRef*> groupbyCols;
+    CVarRef *industry = new CVarRef(String, "Industry_name_NZSIOC");
+    CVarRef *units = new CVarRef(String, "Units");
+    
+    groupbyCols.push_back(industry);
+    groupbyCols.push_back(units);
+    
+    ILValue *sum = new MultiLValue(Int, "Value", groupbyCols);
+    CVarRef *val = new CVarRef(Int, "Value"); 
+    ScaOpAdd *adder = new ScaOpAdd(sum, val);
+    ScaOpAssign *assigner = new ScaOpAssign(sum, adder);
+
+    ILValue *count = new MultiLValue(Int, "Count", groupbyCols);
+    ScaOpAdd *adderOne = new ScaOpAdd(count, new IntValue(1));
+    ScaOpAssign *assignerCount = new ScaOpAssign(count, adderOne);
+
+    CMemReadAccessor readAccessor = table->getAccessor();
+    AccessorRelOp* accessorRelOp = new AccessorRelOp(&readAccessor);
+
+    vector<string> colNames;
+    colNames.push_back("Agency");
+    colNames.push_back("Units");
+    colNames.push_back("Sum");
+    colNames.push_back("Count");
+    vector<Type> colTypes;
+    colTypes.push_back(String);
+    colTypes.push_back(String);
+    colTypes.push_back(Int);
+    colTypes.push_back(Int);
+    vector<IScalar*> trees;
+    trees.push_back(industry);
+    trees.push_back(units);
+    trees.push_back(assigner);
+    trees.push_back(assignerCount);
+
+    CProject *projector = new CProject(*accessorRelOp, colNames, colTypes, trees, true);
+
+    CMultiGroupBy *grouper = new CMultiGroupBy(*projector);
+
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
+    vector<IVariable*> params;
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(tree->evalTree(grouper, params))->at(0));
 }
 
 

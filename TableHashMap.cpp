@@ -10,8 +10,9 @@
 using namespace std;
 
 TableHashMap::TableHashMap(vector<string> *colNames, vector<Type> *colTypes) {
-    this->colNames = colNames;
-    this->colTypes = colTypes;
+    
+    this->colNames = *colNames;
+    this->colTypes = *colTypes;
 }
 
 void TableHashMap::insert(string tableKey, Record* tableValue) {
@@ -39,9 +40,9 @@ unordered_map<string, Record*>::const_iterator TableHashMap::end() const {
 }
 
 const vector<string>& TableHashMap::getColNames() const {
-    return *colNames;
+    return colNames;
 }
 
 const vector<Type>& TableHashMap::getColTypes() const {
-    return *colTypes;
+    return colTypes;
 }

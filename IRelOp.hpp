@@ -118,7 +118,7 @@ class CMultiGroupBy : public IJoin {
     vector<IAccessor*>* producedAccessors;
 
     public:
-        CMultiGroupBy(vector<IRelOp&>* hashAccessors);
+        CMultiGroupBy(IRelOp& child);
         virtual vector<IJob<IRelOp, vector<IAccessor*>*, vector<IVariable*>>*>* getChildren();
         virtual void Op(vector<IVariable*>& params);
         virtual vector<IAccessor*>* Value();

@@ -15,8 +15,8 @@
 
     unordered_map<string, Record*> hashedRecords;
 
-    vector<string> *colNames;
-    vector<Type> *colTypes;
+    vector<string> colNames;
+    vector<Type> colTypes;
 
     public:
         TableHashMap(vector<string> *colNames, vector<Type> *colTypes);
