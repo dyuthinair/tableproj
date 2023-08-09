@@ -32,7 +32,7 @@ void CRecordColumn::Update(const Record& value) {
 
 int CRecordColumn::Comp(IScalar& rhs) {
     ITracer::GetTracer()->Trace("CRecordColumn::Comp called\n");
-    int comp;
+    int comp = 0;
     switch(type) {
         case String: 
             comp = record->strings.at(col).compare(rhs.Value().strings.at(col));
