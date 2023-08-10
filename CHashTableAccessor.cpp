@@ -59,6 +59,10 @@ Record* CHashTableAccessor::getNextRecord() {
             recValue->booleans.at(recValue->booleans.size()-1) = recValue->booleans.at(0);
             recValue->booleans.erase(recValue->booleans.begin());
             break;
+        case Datetime: 
+            recValue->datetimes.at(recValue->datetimes.size()-1) = recValue->datetimes.at(0);
+            recValue->datetimes.erase(recValue->datetimes.begin());
+            break;
         case EnumCount: 
             throw("Not a real type");
             break;

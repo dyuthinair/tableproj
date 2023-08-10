@@ -42,6 +42,9 @@ void CVarRuntimeUsingRecord::Update(const Record& value) {
         case Boolean: 
             returnValue.booleans.push_back(value.booleans.at(this->col));
             break;
+        case Datetime: 
+            returnValue.datetimes.push_back(value.datetimes.at(this->col));
+            break;
         case EnumCount:
             throw("Invalid type");  
             break;

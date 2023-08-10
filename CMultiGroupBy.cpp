@@ -76,6 +76,9 @@ void CMultiGroupBy::Op(vector<IVariable*>& params) {
                     case Boolean: 
                         leftRecord->booleans.push_back(rightRecord->booleans.at(rightRecord->booleans.size()-1));
                         break;
+                    case Datetime: 
+                        leftRecord->datetimes.push_back(rightRecord->datetimes.at(rightRecord->datetimes.size()-1));
+                        break;
                     case EnumCount: 
                         throw("Not a real type");
                 }

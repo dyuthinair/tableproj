@@ -6,6 +6,7 @@
 #include "CCSVSerializer.hpp"
 #include <iostream>
 #include <fstream>
+#include <ctime>
 
 using namespace std;
 
@@ -65,6 +66,15 @@ void CCSVSerializer::serialize(string path, IAccessor &tableReader) {
                     } else {
                         throw("Invalid boolean value");
                     }
+                    break;
+                }
+                case Datetime: 
+                {
+                    time_t val;
+                    val = record->datetimes.at(indices[Datetime]);
+                    char timeString[size("yyyy-mm-ddThh:mm:ssZ")];
+                    strftime(timeString, size(timeString), "%Y-%m-%d %H:%M:%S", gmtime(&val));
+                    row += timeString;
                     break;
                 }
                 case EnumCount:

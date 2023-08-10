@@ -53,6 +53,9 @@ void MultiLValue::Update(const Record& value) {
         case Boolean: 
             toBeUpdated->booleans.at(0) = value.booleans.at(0);
             break;
+        case Datetime: 
+            toBeUpdated->datetimes.at(0) = value.datetimes.at(0);
+            break;
         case EnumCount: 
             throw("Not a real type");
             break;
@@ -87,6 +90,8 @@ Record* MultiLValue::find() {
             case Boolean: 
                 colKey += to_string(col->Value().booleans.at(0));
                 break;
+            case Datetime:
+                throw("Cannot group by on datetimes");
             case EnumCount:
                 throw("Invalid type");  
                 break;
@@ -109,6 +114,8 @@ Record* MultiLValue::find() {
                 case Boolean: 
                     recWithCols->booleans.push_back(col->Value().booleans.at(0));
                     break;
+                case Datetime:
+                    throw("Cannot group by on datetimes");
                 case EnumCount:
                     throw("Invalid type");  
                     break;

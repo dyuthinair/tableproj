@@ -5,6 +5,8 @@
 /*************************************************/
 #include <string>
 #include <unordered_map>
+#include <vector>
+
 using namespace std;
 
 #pragma once
@@ -19,5 +21,5 @@ class Tokenizer
     public:
         Tokenizer(string& line);
         bool HasMore();
-        string GetToken();
+        string GetToken(vector<char> delimeters);
 };

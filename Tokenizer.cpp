@@ -5,6 +5,7 @@
 /*************************************************/
 #include "Tokenizer.hpp"
 #include <algorithm>
+
 using namespace std;
 
 Tokenizer::Tokenizer(string& line)
@@ -19,7 +20,7 @@ bool Tokenizer::HasMore()
     return currentChar != line.end();
 }
 
-string Tokenizer::GetToken()
+string Tokenizer::GetToken(vector<char> delimeters)
 {
     if (!Tokenizer::HasMore())
         throw "No more token";
@@ -29,7 +30,7 @@ string Tokenizer::GetToken()
     {
         if (*currentChar=='"')
             quoteIndex = !quoteIndex;
-        if ((*currentChar == ',' || *currentChar == ':') && !quoteIndex) {
+        if ((find(delimeters.begin(), delimeters.end(), *currentChar) != delimeters.end()) && !quoteIndex) {
             break;
         }
     }

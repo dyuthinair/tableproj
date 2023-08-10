@@ -4,12 +4,14 @@
 /*                                               */
 /*************************************************/
 #include "CCSVDeserializer.hpp"
+#include "Tokenizer.hpp"
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
-#include "Tokenizer.hpp"
+#include <time.h>
+#include <string.h>
 
 using namespace std;
 
@@ -23,6 +25,8 @@ void CCSVDeserializer::initMap() {
     enumMap["string"] = String;
     enumMap["int"] = Int;
     enumMap["float"] = Float;
+    enumMap["boolean"] = Boolean;
+    enumMap["datetime"] = Datetime;
 }
 
 inline std::string trim(std::string& str)
@@ -46,12 +50,12 @@ void CCSVDeserializer::deserialize(string path, IWriteAccessor &tableWriter) {
         while(tokenizer.HasMore())
         {
             if (isFirstRow) {
-                string name = tokenizer.GetToken();
+                string name = tokenizer.GetToken({',', ':'});
                 colNames.push_back(name);
-                string type = tokenizer.GetToken();
+                string type = tokenizer.GetToken({',', ':'});
                 colTypes.push_back(enumMap.at(type));
             } else {
-                string token = tokenizer.GetToken();
+                string token = tokenizer.GetToken({','});
                 Type type = colTypes[col];
                 insert(type, prow, token);
             }
@@ -92,6 +96,16 @@ void CCSVDeserializer::insert (Type type, Record* prow, string value) {
             }
             prow->booleans.push_back(val);
             break;
+        case Datetime:
+        {
+            time_t parsedTime;
+            struct tm tm;
+            istringstream ss(value);
+            ss >> get_time(&tm, "%Y-%m-%d %H:%M:%S"); // or just %T in this case
+            parsedTime = mktime(&tm);
+            prow->datetimes.push_back(parsedTime);
+            break;
+        }
         case EnumCount:
             throw("Invalid type");
             break;

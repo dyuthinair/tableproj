@@ -19,6 +19,7 @@ enum Type
     Int,
     Float, 
     Boolean,
+    Datetime,
     EnumCount
 };
 
@@ -34,6 +35,8 @@ inline string toString(Type t)
             return "float";
         case Boolean: 
             return "boolean";
+        case Datetime:
+            return "datetime";
         case EnumCount: 
             throw("Not a real type");
     }
@@ -49,6 +52,7 @@ class Record
         std::vector<int> nums;
         std::vector<float> floats;
         std::vector<bool> booleans;
+        std::vector<time_t> datetimes;
 
         IAccessor* SetValue{nullptr};
 
@@ -56,7 +60,8 @@ class Record
             return strings == rhs.strings
             && nums == rhs.nums
             && floats == rhs.floats
-            && booleans == rhs.booleans;
+            && booleans == rhs.booleans
+            && datetimes == rhs.datetimes;
         }   
 
         void copy(const Record& rec) {
@@ -64,6 +69,7 @@ class Record
             this->nums.clear();
             this->floats.clear();
             this->booleans.clear();
+            this->datetimes.clear();
             this->add(rec);
         }
 
@@ -79,6 +85,9 @@ class Record
             }
             for(bool boolean : rec.booleans) {
                 this->booleans.push_back(boolean);
+            }
+            for(time_t date : rec.datetimes) {
+                this->datetimes.push_back(date);
             }
             this->SetValue = rec.SetValue;
         }

@@ -104,6 +104,10 @@ void CInnerJoin::CollectMetadata(IAccessor& accessor,
                 runtimeParams.push_back(new CVarRuntimeUsingRecord(Boolean, curName, indices[Boolean], tableName));
                 indices[Boolean]++;
                 break;
+            case Datetime: 
+                runtimeParams.push_back(new CVarRuntimeUsingRecord(Datetime, curName, indices[Datetime], tableName));
+                indices[Datetime]++;
+                break;
             case EnumCount:
                 throw("Invalid type");  
                 break;

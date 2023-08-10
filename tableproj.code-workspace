@@ -36,7 +36,20 @@
 			"string": "cpp",
 			"unordered_set": "cpp",
 			"vector": "cpp",
-			"stdexcept": "cpp"
+			"stdexcept": "cpp",
+			"atomic": "cpp",
+			"cmath": "cpp",
+			"cstdarg": "cpp",
+			"ctime": "cpp",
+			"algorithm": "cpp",
+			"iterator": "cpp",
+			"memory": "cpp",
+			"memory_resource": "cpp",
+			"numeric": "cpp",
+			"random": "cpp",
+			"fstream": "cpp",
+			"iomanip": "cpp",
+			"sstream": "cpp"
 		}
 	}
 }

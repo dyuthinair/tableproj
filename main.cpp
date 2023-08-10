@@ -34,6 +34,7 @@ void countTest();
 void sumTest();
 void groupByTest();
 void multiGroupByTest();
+void testDatetime();
 
 //bool TestBoolScaOpTree();
 
@@ -77,7 +78,8 @@ void UnitTests(int argc, char* argv[])
     //countTest();
     //sumTest();
     //groupByTest();
-    multiGroupByTest();
+    //multiGroupByTest();
+    testDatetime();
 
     //std::cout << std::boolalpha << TestBoolScaOpTree();
 }
@@ -637,6 +639,20 @@ void multiGroupByTest() {
     vector<IVariable*> params;
     CCSVSerializer *serializer = new CCSVSerializer();
     serializer->serialize(writeFilePath, *(tree->evalTree(grouper, params))->at(0));
+}
+
+void testDatetime()
+{
+    string readFilePath = "..\\testdata\\UserNamesWithDatetime.csv";
+    string writeFilePath = "..\\testdata\\OutputDatetime.csv";
+
+    CMemTable *table = new CMemTable();
+    CCSVDeserializer *deserializer = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessor = table->getWriteAccessor();
+    deserializer->deserialize(readFilePath, writeAccessor);
+
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, table->getAccessor());
 }
 
 

@@ -4,6 +4,7 @@
 /*                                               */
 /*************************************************/
 #include "IScaOp.hpp"
+#include <time.h>
 
 CRecordColumn::CRecordColumn(int col, Type type, Record* record) {
 
@@ -56,6 +57,11 @@ int CRecordColumn::Comp(IScalar& rhs) {
             comp = record->booleans.at(col) - rhs.Value().booleans.at(col);
             comp = normalizeEval(comp);
             ITracer::GetTracer()->Trace("CRecordColumn::Comp result %d\n", comp);
+            break;
+        case Datetime: 
+            comp = (int) difftime(record->datetimes.at(0), rhs.Value().datetimes.at(0));
+            comp = normalizeEval(comp);
+            ITracer::GetTracer()->Trace("CRecordColumn::Comp result %d\n", comp); 
             break;
         case EnumCount:
             throw("Not a real type");

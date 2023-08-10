@@ -4,6 +4,7 @@
 /*                                               */
 /*************************************************/
 #include "CScaOp.hpp"
+#include <time.h>
 
 using namespace std;
 
@@ -33,6 +34,9 @@ void ScaOpEq::Op(vector<IVariable*>& params) {
                 break;
             case Boolean: 
                 throw("Cannot compare booleanas"); 
+                break;
+            case Datetime:
+                throw("Cannot compare datetimes"); 
                 break;
             case EnumCount:
                 throw("Not a real type");
@@ -88,6 +92,9 @@ void ScaOpAdd::Op(vector<IVariable*>& params)
             case Boolean: 
                 throw("Cannot add booleanas"); 
                 break;
+            case Datetime: 
+                throw("Cannot add datetimes"); 
+                break;
             case EnumCount:
                 throw("Not a real type");
                 break;
@@ -141,6 +148,9 @@ void ScaOpSub::Op(vector<IVariable*>& params)
                 break;
             case Boolean: 
                 throw("Cannot subtract booleanas"); 
+                break;
+            case Datetime: 
+                throw("Cannot subtract datetimes"); 
                 break;
             case EnumCount:
                 throw("Not a real type");
@@ -198,6 +208,9 @@ void ScaOpGt::Op(vector<IVariable*>& params)
             case Boolean: 
                 throw("Cannot compare booleanas"); 
                 break;
+            case Datetime: 
+                throw("Cannot compare datetimes"); 
+                break;
             case EnumCount:
                 throw("Not a real type");
                 break;
@@ -253,6 +266,9 @@ void ScaOpLt::Op(vector<IVariable*>& params)
                 break;
             case Boolean: 
                 throw("Cannot compare booleanas"); 
+                break;
+            case Datetime: 
+                throw("Cannot compare datetimes"); 
                 break;
             case EnumCount:
                 throw("Not a real type");
@@ -348,6 +364,11 @@ void ScaOpComp::Op(vector<IVariable*>& params)
                 comp = val1->Value().booleans.at(0) - val2->Value().booleans.at(0);
                 this->eval = IntValue(normalizeEval(comp));
                 ITracer::GetTracer()->Trace("ScaOpComp::Op result %d\n", eval.Value().nums.at(0));
+                break;
+            case Datetime: 
+                comp = (int) difftime(val1->Value().datetimes.at(0), val1->Value().datetimes.at(0));
+                this->eval = IntValue(normalizeEval(comp));
+                ITracer::GetTracer()->Trace("ScaOpComp::Op result %d\n", eval.Value().nums.at(0)); 
                 break;
             case EnumCount:
                 throw("Not a real type");
