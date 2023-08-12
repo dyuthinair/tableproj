@@ -64,7 +64,7 @@ void CCSVSerializer::serialize(string path, IAccessor &tableReader) {
                     } else if(val == false) {
                         row += "False";
                     } else {
-                        throw("Invalid boolean value");
+                        throw std::invalid_argument("Invalid boolean value");
                     }
                     break;
                 }
@@ -72,6 +72,7 @@ void CCSVSerializer::serialize(string path, IAccessor &tableReader) {
                 {
                     time_t val;
                     val = record->datetimes.at(indices[Datetime]);
+                    indices[Datetime]++;
                     char timeString[size("yyyy-mm-ddThh:mm:ssZ")];
                     strftime(timeString, size(timeString), "%Y-%m-%d %H:%M:%S", gmtime(&val));
                     row += timeString;
@@ -79,7 +80,7 @@ void CCSVSerializer::serialize(string path, IAccessor &tableReader) {
                 }
                 case EnumCount:
                 {
-                    throw("Invalid type");
+                    throw std::invalid_argument("Invalid type");
                     break;
                 }
             }

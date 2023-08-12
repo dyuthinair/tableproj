@@ -42,6 +42,7 @@ class CProject : public IProject {
     vector<IScalar*> trees;
     vector<IAccessor*>* producedAccessors;
     bool projectAgg;
+    IAccessor* outputAccessor;
 
     public:
         CProject(IRelOp& child, vector<string> colNames, vector<Type> colTypes, vector<IScalar*> trees, bool projectAgg);

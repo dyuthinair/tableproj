@@ -8,6 +8,7 @@
 #include "CMemTable.hpp"
 #include "CVarRuntimeUsingRecord.hpp"
 #include <memory>
+#include <time.h>
 
 CProject::CProject(IRelOp& child, vector<string> colNames, vector<Type> colTypes, 
                     vector<IScalar*> trees, bool projectAgg) {
@@ -18,6 +19,7 @@ CProject::CProject(IRelOp& child, vector<string> colNames, vector<Type> colTypes
     this->trees = trees;
     this->projectAgg = projectAgg;
     producedAccessors = new vector<IAccessor*>();
+    outputAccessor = nullptr;
 }
 
 
@@ -40,7 +42,6 @@ void CProject::Op(vector<IVariable*>& params) {
     }
 
     Record* prevRecord = nullptr;
-
     while(true) {
         Record* output = new Record();
 
@@ -83,8 +84,14 @@ void CProject::Op(vector<IVariable*>& params) {
             } else if(!curEval.booleans.empty()) {
                 output->booleans.push_back(curEval.booleans.at(0));
                 ITracer::GetTracer()->Trace("Boolean added: %s\n", curEval.booleans.at(0) ? "true" : "false");
+            } else if(!curEval.datetimes.empty()) {
+                time_t evalDate = curEval.datetimes.at(0);
+                output->datetimes.push_back(evalDate);
+                char timeString[size("yyyy-mm-ddThh:mm:ssZ")];
+                strftime(timeString, size(timeString), "%Y-%m-%d %H:%M:%S", gmtime(&evalDate));
+                ITracer::GetTracer()->Trace("Datetime added: %s\n", to_string(curEval.datetimes.at(0)).c_str());
             } else {
-                throw ("Scalar evaluation not done properly");
+                throw std::invalid_argument ("Scalar evaluation not done properly");
             }            
         }
         if(!projectAgg) { 
@@ -93,10 +100,14 @@ void CProject::Op(vector<IVariable*>& params) {
             prevRecord = output;
         }
     }
+    this->outputAccessor = &outputTable->getAccessor();
     ITracer::GetTracer()->Trace("CProject::Op Over\n");
 }
 
 vector<IAccessor*>* CProject::Value() {
+    if(producedAccessors->empty()) {
+        producedAccessors->push_back(outputAccessor);
+    }
     return producedAccessors;
 }
 

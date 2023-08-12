@@ -57,13 +57,13 @@ void MultiLValue::Update(const Record& value) {
             toBeUpdated->datetimes.at(0) = value.datetimes.at(0);
             break;
         case EnumCount: 
-            throw("Not a real type");
+            throw std::invalid_argument("Not a real type");
             break;
     }    
 }
 
 void MultiLValue::Combine(Record* value) {
-    throw("How to combine LValue?");
+    throw std::invalid_argument("How to combine LValue?");
 }
 
 vector<IJob<IScalar, Record, vector<IVariable*>>*>* MultiLValue::getChildren() {
@@ -86,14 +86,14 @@ Record* MultiLValue::find() {
                 colKey += to_string(col->Value().nums.at(0));
                 break;
             case Float:
-                throw("Cannot group by on floats");
+                throw std::invalid_argument("Cannot group by on floats");
             case Boolean: 
                 colKey += to_string(col->Value().booleans.at(0));
                 break;
             case Datetime:
-                throw("Cannot group by on datetimes");
+                throw std::invalid_argument("Cannot group by on datetimes");
             case EnumCount:
-                throw("Invalid type");  
+                throw std::invalid_argument("Invalid type");  
                 break;
         }
     }
@@ -110,14 +110,14 @@ Record* MultiLValue::find() {
                     recWithCols->nums.push_back(col->Value().nums.at(0));
                     break;
                 case Float:
-                    throw("Cannot group by on floats");
+                    throw std::invalid_argument("Cannot group by on floats");
                 case Boolean: 
                     recWithCols->booleans.push_back(col->Value().booleans.at(0));
                     break;
                 case Datetime:
-                    throw("Cannot group by on datetimes");
+                    throw std::invalid_argument("Cannot group by on datetimes");
                 case EnumCount:
-                    throw("Invalid type");  
+                    throw std::invalid_argument("Invalid type");  
                     break;
             }
         }

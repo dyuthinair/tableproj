@@ -55,7 +55,7 @@ void CSelect::Op(vector<IVariable*>& params) {
         JobEval<IScalar, Record, vector<IVariable*>>* evaluator = new JobEval<IScalar, Record, vector<IVariable*>>();
         Record curEval = evaluator->evalTree(tree, varParams);
         if(curEval.booleans.empty()) {
-            throw("Input to select should be a boolean value");
+            throw std::invalid_argument("Input to select should be a boolean value");
         } 
         if(curEval.booleans.at(0)) {
             Record* newRecord = new Record();

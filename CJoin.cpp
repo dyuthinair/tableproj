@@ -56,7 +56,7 @@ void CInnerJoin::Op(vector<IVariable*>& params) {
             JobEval<IScalar, Record, vector<IVariable*>>* evaluator = new JobEval<IScalar, Record, vector<IVariable*>>();
             Record curEval = evaluator->evalTree(tree, varParams);
             if(curEval.booleans.empty()) {
-                throw("Join scalars should evaluate to be a boolean value");
+                throw std::invalid_argument("Join scalars should evaluate to be a boolean value");
             } 
             if(curEval.booleans.at(0)) {
                 Record* newRecord = new Record();
@@ -109,7 +109,7 @@ void CInnerJoin::CollectMetadata(IAccessor& accessor,
                 indices[Datetime]++;
                 break;
             case EnumCount:
-                throw("Invalid type");  
+                throw std::invalid_argument("Invalid type");  
                 break;
         }
     }

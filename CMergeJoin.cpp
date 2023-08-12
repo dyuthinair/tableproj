@@ -157,7 +157,7 @@ void CMergeJoin::CollectMetadata(IAccessor& accessor,
                 indices[Datetime]++;
                 break;
             case EnumCount:
-                throw("Invalid type");  
+                throw std::invalid_argument("Invalid type");  
                 break;
         }
     }

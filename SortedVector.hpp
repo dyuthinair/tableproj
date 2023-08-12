@@ -26,5 +26,5 @@ class SortedVector: ITable {
     public:
         SortedVector(IAccessor& input, string colName, bool ascending);
         CMemReadAccessor& getAccessor();
-        CMemWriteAccessor& getWriteAccessor() { throw("unsupported");}
+        CMemWriteAccessor& getWriteAccessor() { throw std::invalid_argument("unsupported");}
 };

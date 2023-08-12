@@ -92,7 +92,7 @@ void CCSVDeserializer::insert (Type type, Record* prow, string value) {
             } else if(value.compare("False") == 0 || value.compare("false") == 0){
                 val = false;
             } else {
-                throw("Invalid boolean value");
+                throw std::invalid_argument("Invalid boolean value");
             }
             prow->booleans.push_back(val);
             break;
@@ -107,7 +107,7 @@ void CCSVDeserializer::insert (Type type, Record* prow, string value) {
             break;
         }
         case EnumCount:
-            throw("Invalid type");
+            throw std::invalid_argument("Invalid type");
             break;
     }
 }

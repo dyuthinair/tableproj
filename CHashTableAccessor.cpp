@@ -64,13 +64,13 @@ Record* CHashTableAccessor::getNextRecord() {
             recValue->datetimes.erase(recValue->datetimes.begin());
             break;
         case EnumCount: 
-            throw("Not a real type");
+            throw std::invalid_argument("Not a real type");
             break;
     }
     return recValue;
 }
 
 string CHashTableAccessor::getName() {
-    throw("Should never be called");
+    throw std::invalid_argument("Should never be called");
 }
 

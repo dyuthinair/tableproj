@@ -47,7 +47,7 @@ class CConstVal: public IScalar, public Record {
         virtual Record Value() = 0;
         virtual void Op(vector<IVariable*>& params) {};
         virtual void update(Record* value) {};
-        virtual int Comp(IScalar& rhs) {throw("Should never be called");};
+        virtual int Comp(IScalar& rhs) {throw std::invalid_argument("Should never be called");};
 };
 
 class CVarRef: public IVariable {
@@ -71,7 +71,7 @@ class CVarRef: public IVariable {
         virtual void Op(vector<IVariable*>& params);
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
 
-        virtual int Comp(IScalar& rhs) {throw("Should never be called");};
+        virtual int Comp(IScalar& rhs) {throw std::invalid_argument("Should never be called");};
 };
 
 class CVarRuntime: public IVariable {
@@ -93,7 +93,7 @@ class CVarRuntime: public IVariable {
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
         virtual void Op(vector<IVariable*>& params){};
 
-        virtual int Comp(IScalar& rhs) {throw("Should never be called");};
+        virtual int Comp(IScalar& rhs) {throw std::invalid_argument("Should never be called");};
 };
 
 class ILValue : public IVariable {
@@ -135,7 +135,7 @@ class LValue : public ILValue {
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
         virtual void Op(vector<IVariable*>& params){};
 
-        virtual int Comp(IScalar& rhs) {throw("Should never be called");};
+        virtual int Comp(IScalar& rhs) {throw std::invalid_argument("Should never be called");};
 };
 
 class MultiLValue : public ILValue {
@@ -161,7 +161,7 @@ class MultiLValue : public ILValue {
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren();
         virtual void Op(vector<IVariable*>& params){};
 
-        virtual int Comp(IScalar& rhs) {throw("Should never be called");};
+        virtual int Comp(IScalar& rhs) {throw std::invalid_argument("Should never be called");};
 };
 
 class IntValue: public CConstVal
@@ -277,6 +277,30 @@ class CRecordColumn:public IScalar {
         virtual int Comp(IScalar& rhs);
 
         virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {return nullptr;};
+};
+
+class DatetimeValue: public CConstVal
+{
+    public:
+        DatetimeValue(){};
+        DatetimeValue(time_t value)
+        {
+            datetimes.push_back(value);
+        }
+        virtual Record Value()
+        {
+            return *this;
+        }
+        virtual Type getType() {
+            return Datetime;
+        }
+        virtual vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren() {
+            return nullptr;
+        }
+        virtual void update(bool value) {
+            datetimes.pop_back();
+            datetimes.push_back(value);
+        }
 };
 
 

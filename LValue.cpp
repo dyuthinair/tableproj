@@ -29,6 +29,6 @@ void LValue::Update(const Record& value) {
 }
 
 void LValue::Combine(Record* value) {
-    throw("How to combine LValue?");
+    throw std::invalid_argument("How to combine LValue?");
 }
 

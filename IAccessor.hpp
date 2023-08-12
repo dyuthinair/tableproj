@@ -6,6 +6,7 @@
 /*************************************************/
 #pragma once
 
+#include <stdexcept>
 #include <vector>
 #include <string>
 #include "IJob.hpp"
@@ -38,9 +39,9 @@ inline string toString(Type t)
         case Datetime:
             return "datetime";
         case EnumCount: 
-            throw("Not a real type");
+            throw std::invalid_argument("Not a real type");
     }
-    throw("Unreachable code");
+    throw std::invalid_argument("Unreachable code");
 }
 
 class IAccessor;

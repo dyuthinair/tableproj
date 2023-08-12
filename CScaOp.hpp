@@ -10,7 +10,7 @@ using namespace std;
 
 class CScaOp: public IScaOp {
     virtual void Op(vector<IVariable*>& params) = 0;
-    virtual int Comp(IScalar& rhs) {throw("Should never be called");};
+    virtual int Comp(IScalar& rhs) {throw std::invalid_argument("Should never be called");};
 };
 
 class ScaOpEq: public CScaOp
@@ -120,6 +120,20 @@ class ScaOpAssign: public CScaOp
 
     public:
         ScaOpAssign(ILValue *val1, IScalar *val2);
+        void Op(vector<IVariable*>& params);
+        Record Value();
+        Type getType();
+        vector<IJob<IScalar, Record, vector<IVariable*>>*>* getChildren();
+};
+
+class ScaOpBin: public CScaOp
+{
+    IScalar *eval;
+    IScalar *val1;
+    IntValue *val2;
+
+    public:
+        ScaOpBin(IScalar *val1, IntValue *val2);
         void Op(vector<IVariable*>& params);
         Record Value();
         Type getType();

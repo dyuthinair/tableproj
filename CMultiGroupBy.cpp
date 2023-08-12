@@ -80,7 +80,7 @@ void CMultiGroupBy::Op(vector<IVariable*>& params) {
                         leftRecord->datetimes.push_back(rightRecord->datetimes.at(rightRecord->datetimes.size()-1));
                         break;
                     case EnumCount: 
-                        throw("Not a real type");
+                        throw std::invalid_argument("Not a real type");
                 }
             }
         } 

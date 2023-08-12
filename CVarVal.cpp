@@ -45,7 +45,8 @@ void CVarRef::Op(vector<IVariable*>& params) {
             }
             index++;
         }
-        throw("Did not find runtime value");
+        string errMessage = "Did not find runtime value: " + this->name;
+        throw std::invalid_argument(errMessage);
     } else {
         IVariable* curVar = params.at(index);
         Record *var = new Record();
@@ -56,10 +57,10 @@ void CVarRef::Op(vector<IVariable*>& params) {
 
 void CVarRef::Update(const Record& value)
 {
-    throw("Unsupported");
+    throw std::invalid_argument("Unsupported");
 }
 
 void CVarRef::Combine(Record* value)
 {
-    throw("Unsupported");
+    throw std::invalid_argument("Unsupported");
 }

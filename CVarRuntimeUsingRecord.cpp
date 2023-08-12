@@ -27,6 +27,7 @@ void CVarRuntimeUsingRecord::Update(const Record& value) {
     returnValue.nums.clear();
     returnValue.floats.clear();
     returnValue.strings.clear();
+    returnValue.datetimes.clear();
     
     switch(type)
     {
@@ -46,13 +47,13 @@ void CVarRuntimeUsingRecord::Update(const Record& value) {
             returnValue.datetimes.push_back(value.datetimes.at(this->col));
             break;
         case EnumCount:
-            throw("Invalid type");  
+            throw std::invalid_argument("Invalid type");  
             break;
     }
 }
 
 void CVarRuntimeUsingRecord::Combine(Record* value) {
-   throw("What?");
+   throw std::invalid_argument("What?");
 }
 
 Record CVarRuntimeUsingRecord::Value() {

@@ -21,7 +21,7 @@ void ScaOpEq::Op(vector<IVariable*>& params) {
     if(val1->getType() == val2->getType()) {
         switch(val1->getType()) {
             case String: 
-                throw("Cannot compare strings"); 
+                throw std::invalid_argument("Cannot compare strings"); 
                 break;
             case Int: 
                 result = val1->Value().nums.at(0) == val2->Value().nums.at(0);
@@ -33,17 +33,17 @@ void ScaOpEq::Op(vector<IVariable*>& params) {
                 ITracer::GetTracer()->Trace("ScaOpEq::Op result %s\n",  eval.Value().booleans.at(0) ? "true" : "false");
                 break;
             case Boolean: 
-                throw("Cannot compare booleanas"); 
+                throw std::invalid_argument("Cannot compare booleanas"); 
                 break;
             case Datetime:
-                throw("Cannot compare datetimes"); 
+                throw std::invalid_argument("Cannot compare datetimes"); 
                 break;
             case EnumCount:
-                throw("Not a real type");
+                throw std::invalid_argument("Not a real type");
                 break;
         }
     }  else {
-        throw("Type mismatch");
+        throw std::invalid_argument("Type mismatch");
     }
 }
 
@@ -55,7 +55,7 @@ Type ScaOpEq::getType() {
     if(val1->getType() == val2->getType()) {
         return val1->getType();
     } else {
-        throw("Type mismatch");
+        throw std::invalid_argument("Type mismatch");
     }
 }
 
@@ -79,7 +79,7 @@ void ScaOpAdd::Op(vector<IVariable*>& params)
     if(val1->getType() == val2->getType()) {
         switch(val1->getType()) {
             case String: 
-                throw("Cannot add strings"); 
+                throw std::invalid_argument("Cannot add strings"); 
                 break;
             case Int: 
                 this->result = new IntValue(val1->Value().nums.at(0) + val2->Value().nums.at(0));
@@ -90,17 +90,17 @@ void ScaOpAdd::Op(vector<IVariable*>& params)
                 ITracer::GetTracer()->Trace("ScaOpAdd::Op result %f\n",  result->Value().floats.at(0));
                 break;
             case Boolean: 
-                throw("Cannot add booleanas"); 
+                throw std::invalid_argument("Cannot add booleanas"); 
                 break;
             case Datetime: 
-                throw("Cannot add datetimes"); 
+                throw std::invalid_argument("Cannot add datetimes"); 
                 break;
             case EnumCount:
-                throw("Not a real type");
+                throw std::invalid_argument("Not a real type");
                 break;
         }
     }  else {
-        throw("Type mismatch");
+        throw std::invalid_argument("Type mismatch");
     }
 }
 
@@ -112,7 +112,7 @@ Type ScaOpAdd::getType() {
     if(val1->getType() == val2->getType()) {
         return val1->getType();
     } else {
-        throw("Type mismatch");
+        throw std::invalid_argument("Type mismatch");
     }
 }
 
@@ -136,7 +136,7 @@ void ScaOpSub::Op(vector<IVariable*>& params)
     if(val1->getType() == val2->getType()) {
         switch(val1->getType()) {
             case String: 
-                throw("Cannot subtract strings"); 
+                throw std::invalid_argument("Cannot subtract strings"); 
                 break;
             case Int: 
                 this->result = new IntValue(val1->Value().nums.at(0) - val2->Value().nums.at(0));
@@ -147,17 +147,17 @@ void ScaOpSub::Op(vector<IVariable*>& params)
                 ITracer::GetTracer()->Trace("ScaOpSub::Op result %f\n",  result->Value().floats.at(0));
                 break;
             case Boolean: 
-                throw("Cannot subtract booleanas"); 
+                throw std::invalid_argument("Cannot subtract booleanas"); 
                 break;
             case Datetime: 
-                throw("Cannot subtract datetimes"); 
+                throw std::invalid_argument("Cannot subtract datetimes"); 
                 break;
             case EnumCount:
-                throw("Not a real type");
+                throw std::invalid_argument("Not a real type");
                 break;
         }
     }  else {
-        throw("Type mismatch");
+        throw std::invalid_argument("Type mismatch");
     }
 }
 
@@ -169,7 +169,7 @@ Type ScaOpSub::getType() {
     if(val1->getType() == val2->getType()) {
         return val1->getType();
     } else {
-        throw("Type mismatch");
+        throw std::invalid_argument("Type mismatch");
     }
 }
 
@@ -194,7 +194,7 @@ void ScaOpGt::Op(vector<IVariable*>& params)
     if(val1->getType() == val2->getType()) {
         switch(val1->getType()) {
             case String: 
-                throw("Cannot compare strings"); 
+                throw std::invalid_argument("Cannot compare strings"); 
                 break;
             case Int: 
                 result = val1->Value().nums.at(0) > val2->Value().nums.at(0);
@@ -206,17 +206,17 @@ void ScaOpGt::Op(vector<IVariable*>& params)
                 ITracer::GetTracer()->Trace("ScaOpGt::Op result %s\n",  eval.Value().booleans.at(0) ? "true" : "false");
                 break;
             case Boolean: 
-                throw("Cannot compare booleanas"); 
+                throw std::invalid_argument("Cannot compare booleanas"); 
                 break;
             case Datetime: 
-                throw("Cannot compare datetimes"); 
+                throw std::invalid_argument("Cannot compare datetimes"); 
                 break;
             case EnumCount:
-                throw("Not a real type");
+                throw std::invalid_argument("Not a real type");
                 break;
         }
     }  else {
-        throw("Type mismatch");
+        throw std::invalid_argument("Type mismatch");
     }
 }
 
@@ -228,7 +228,7 @@ Type ScaOpGt::getType() {
     if(val1->getType() == val2->getType()) {
         return val1->getType();
     } else {
-        throw("Type mismatch");
+        throw std::invalid_argument("Type mismatch");
     }
 }
 
@@ -253,7 +253,7 @@ void ScaOpLt::Op(vector<IVariable*>& params)
     if(val1->getType() == val2->getType()) {
         switch(val1->getType()) {
             case String: 
-                throw("Cannot compare strings"); 
+                throw std::invalid_argument("Cannot compare strings"); 
                 break;
             case Int: 
                 result = val1->Value().nums.at(0) < val2->Value().nums.at(0);
@@ -265,17 +265,17 @@ void ScaOpLt::Op(vector<IVariable*>& params)
                 ITracer::GetTracer()->Trace("ScaOpLt::Op result %s\n",  eval.Value().booleans.at(0) ? "true" : "false");
                 break;
             case Boolean: 
-                throw("Cannot compare booleanas"); 
+                throw std::invalid_argument("Cannot compare booleanas"); 
                 break;
             case Datetime: 
-                throw("Cannot compare datetimes"); 
+                throw std::invalid_argument("Cannot compare datetimes"); 
                 break;
             case EnumCount:
-                throw("Not a real type");
+                throw std::invalid_argument("Not a real type");
                 break;
         }
     }  else {
-        throw("Type mismatch");
+        throw std::invalid_argument("Type mismatch");
     }
 }
 
@@ -287,7 +287,7 @@ Type ScaOpLt::getType() {
     if(val1->getType() == val2->getType()) {
         return val1->getType();
     } else {
-        throw("Type mismatch");
+        throw std::invalid_argument("Type mismatch");
     }
 }
 
@@ -309,7 +309,7 @@ void ScaOpFtoI::Op(vector<IVariable*>& params)
     ITracer::GetTracer()->Trace("ScaOpFtoI::Op called \n");
 
     if(val1->getType() != Float) {
-        throw("Cannot call convert float to int without a float");
+        throw std::invalid_argument("Cannot call convert float to int without a float");
     }  else {
         int num = static_cast<int>(val1->Value().floats.at(0));
         eval = IntValue(num);
@@ -371,11 +371,11 @@ void ScaOpComp::Op(vector<IVariable*>& params)
                 ITracer::GetTracer()->Trace("ScaOpComp::Op result %d\n", eval.Value().nums.at(0)); 
                 break;
             case EnumCount:
-                throw("Not a real type");
+                throw std::invalid_argument("Not a real type");
                 break;
         }
     }  else {
-        throw("Type mismatch");
+        throw std::invalid_argument("Type mismatch");
     }
 }
 
@@ -402,7 +402,7 @@ int ScaOpComp::normalizeEval(int difference) {
     } else if (difference < 0) {
         return -1;
     } else {
-        throw("Unreachable code");
+        throw std::invalid_argument("Unreachable code");
     }
 }
 
@@ -426,11 +426,73 @@ Type ScaOpAssign::getType() {
     if(val1->getType() == val2->getType()) {
         return val1->getType();
     } else {
-        throw("Type mismatch");
+        throw std::invalid_argument("Type mismatch");
     }
 }
 
 vector<IJob<IScalar, Record, vector<IVariable*>>*>* ScaOpAssign::getChildren() {
+    vector<IJob*>* children = new vector<IJob*>();
+    children->push_back(val1);
+    children->push_back(val2);
+    return children;
+}
+
+ScaOpBin::ScaOpBin(IScalar *val1, IntValue *val2) 
+ : val1(val1), val2(val2)
+{
+    eval = nullptr;
+}
+
+void ScaOpBin::Op(vector<IVariable*>& params)
+{
+    int bucketSize = val2->Value().nums.at(0);
+    switch(val1->getType()) {
+        case String: 
+            throw std::invalid_argument("Cannot bin strings");
+            break;
+        case Int: 
+            eval = new IntValue(val1->Value().nums.at(0) / bucketSize);
+            ITracer::GetTracer()->Trace("ScaOpBin::Op between %d and %d results in %d\n", 
+                val1->Value().nums.at(0), bucketSize, eval->Value().nums.at(0));
+            break;
+        case Float: 
+            eval = new IntValue(static_cast<int>(val1->Value().floats.at(0)) / bucketSize);
+            ITracer::GetTracer()->Trace("ScaOpBin::Op between %f and %f results in %d\n", 
+                val1->Value().floats.at(0), val2->Value().floats.at(0), eval->Value().floats.at(0));
+            break;
+        case Boolean: 
+            throw std::invalid_argument("Cannot bin booleans");
+            break;
+        case Datetime: 
+        {
+            time_t valDate;
+            valDate = val1->Value().datetimes.at(0);
+            valDate = valDate - (valDate % bucketSize);
+            eval = new DatetimeValue(valDate);
+            char timeString[size("yyyy-mm-ddThh:mm:ssZ")];
+            strftime(timeString, size(timeString), "%Y-%m-%d %H:%M:%S", gmtime(&valDate));
+            ITracer::GetTracer()->Trace("ScaOpBin::Op result %s\n", timeString); 
+            break;
+        }
+        case EnumCount:
+            throw std::invalid_argument("Not a real type");
+            break;
+    }
+}
+
+Record ScaOpBin::Value() {
+    return eval->Value();
+}
+
+Type ScaOpBin::getType() {
+    if(val1->getType() == val2->getType()) {
+        return val1->getType();
+    } else {
+        throw std::invalid_argument("Type mismatch");
+    }
+}
+
+vector<IJob<IScalar, Record, vector<IVariable*>>*>* ScaOpBin::getChildren() {
     vector<IJob*>* children = new vector<IJob*>();
     children->push_back(val1);
     children->push_back(val2);
@@ -460,7 +522,7 @@ Type ScaOpAnd::getType() {
     if(val1->getType() == val2->getType()) {
         return val1->getType();
     } else {
-        throw("Type mismatch");
+        throw std::invalid_argument("Type mismatch");
     }
 }
 */

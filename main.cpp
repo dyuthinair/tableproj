@@ -35,6 +35,9 @@ void sumTest();
 void groupByTest();
 void multiGroupByTest();
 void testDatetime();
+void binTest();
+void binDatetime();
+void multiGroupByBinTest();
 
 //bool TestBoolScaOpTree();
 
@@ -79,7 +82,10 @@ void UnitTests(int argc, char* argv[])
     //sumTest();
     //groupByTest();
     //multiGroupByTest();
-    testDatetime();
+    //testDatetime();
+    //binTest();
+    //binDatetime();
+    multiGroupByBinTest();
 
     //std::cout << std::boolalpha << TestBoolScaOpTree();
 }
@@ -654,6 +660,174 @@ void testDatetime()
     CCSVSerializer *serializer = new CCSVSerializer();
     serializer->serialize(writeFilePath, table->getAccessor());
 }
+
+void binTest()
+{
+    string readFilePath = "..\\testdata\\UserNamesWithDatetime.csv";
+    string writeFilePath = "..\\testdata\\bin_output.csv";
+
+    CMemTable *table = new CMemTable();
+    CCSVDeserializer *deserializer = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessor = table->getWriteAccessor();
+    deserializer->deserialize(readFilePath, writeAccessor);
+
+    CVarRef *name = new CVarRef(String, "Name");
+    CVarRef *date = new CVarRef(Datetime, "Date");
+    CVarRef *age = new CVarRef(Int, "Age");
+
+    CMemReadAccessor readAccessor = table->getAccessor();
+    AccessorRelOp* accessorRelOp = new AccessorRelOp(&readAccessor);
+
+    ScaOpBin *binner = new ScaOpBin(new CVarRef(Int, "Age"), new IntValue(5));
+
+    vector<string> colNames;
+    colNames.push_back("Name");
+    colNames.push_back("Age");
+    colNames.push_back("Date");
+    colNames.push_back("AgeGroup");
+    vector<Type> colTypes;
+    colTypes.push_back(String);
+    colTypes.push_back(Int);
+    colTypes.push_back(Datetime);
+    colTypes.push_back(Int);
+    vector<IScalar*> trees;
+    trees.push_back(name);
+    trees.push_back(age);
+    trees.push_back(date);
+    trees.push_back(binner);
+
+    CProject *projector = new CProject(*accessorRelOp, colNames, colTypes, trees, false);
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
+    vector<IVariable*> params;
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)->at(0)));
+}
+
+void binDatetime() {
+    string readFilePath = "..\\testdata\\UserNamesWithDatetime.csv";
+    string writeFilePath = "..\\testdata\\bin_output_dt.csv";
+
+    CMemTable *table = new CMemTable();
+    CCSVDeserializer *deserializer = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessor = table->getWriteAccessor();
+    deserializer->deserialize(readFilePath, writeAccessor);
+
+    CVarRef *name = new CVarRef(String, "Name");
+    CVarRef *date = new CVarRef(Datetime, "Date");
+    CVarRef *age = new CVarRef(Int, "Age");
+
+    CMemReadAccessor readAccessor = table->getAccessor();
+    AccessorRelOp* accessorRelOp = new AccessorRelOp(&readAccessor);
+
+    ScaOpBin *binner = new ScaOpBin(date, new IntValue(31536000));
+
+    vector<string> colNames;
+    colNames.push_back("Name");
+    colNames.push_back("Age");
+    colNames.push_back("Date");
+    colNames.push_back("DateGroup");
+    vector<Type> colTypes;
+    colTypes.push_back(String);
+    colTypes.push_back(Int);
+    colTypes.push_back(Datetime);
+    colTypes.push_back(Datetime);
+    vector<IScalar*> trees;
+    trees.push_back(name);
+    trees.push_back(age);
+    trees.push_back(date);
+    trees.push_back(binner);
+
+    CProject *projector = new CProject(*accessorRelOp, colNames, colTypes, trees, false);
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
+    vector<IVariable*> params;
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(tree->evalTree(projector, params)->at(0)));
+}
+
+void multiGroupByBinTest() {
+    string readFilePath = "..\\testdata\\annual-enterprise-survey-2021-financial-year-provisional-csv.csv";
+    string writeFilePath = "..\\testdata\\count_by_industry.csv";
+
+    unique_ptr<CMemTable> table(new CMemTable("Without Size Bands"));
+    CCSVDeserializer *deserializer = new CCSVDeserializer();
+    CMemWriteAccessor writeAccessor = table->getWriteAccessor();
+    deserializer->deserialize(readFilePath, writeAccessor);
+
+    CVarRef *industry = new CVarRef(String, "Industry_name_NZSIOC");
+    CVarRef *units = new CVarRef(String, "Units");
+    CVarRef *val = new CVarRef(Int, "Value");
+    
+    ScaOpBin *binner = new ScaOpBin(val, new IntValue(100));
+
+    CMemReadAccessor readAccessor = table->getAccessor();
+    AccessorRelOp* accessorRelOp = new AccessorRelOp(&readAccessor);
+
+    vector<string> colNames;
+    colNames.push_back("Agency");
+    colNames.push_back("Units");
+    colNames.push_back("Sum");
+    colNames.push_back("Val Bucket");
+    vector<Type> colTypes;
+    colTypes.push_back(String);
+    colTypes.push_back(String);
+    colTypes.push_back(Int);
+    colTypes.push_back(Int);
+    vector<IScalar*> trees;
+    trees.push_back(industry);
+    trees.push_back(units);
+    trees.push_back(val);
+    trees.push_back(binner);
+
+    CProject *projector = new CProject(*accessorRelOp, colNames, colTypes, trees, true);
+
+    CVarRef *industryGB = new CVarRef(String, "Industry_name_NZSIOC");
+    CVarRef *unitsGB = new CVarRef(String, "Units");
+    CVarRef *valGB = new CVarRef(Int, "Value");
+    CVarRef *buckets = new CVarRef(Int, "Val Bucket");
+
+    vector<CVarRef*> groupbyCols;
+
+    groupbyCols.push_back(industryGB);
+    groupbyCols.push_back(unitsGB);
+    groupbyCols.push_back(buckets);
+    
+    ILValue *sum = new MultiLValue(Int, "Sum", groupbyCols);
+    ScaOpAdd *adder = new ScaOpAdd(sum, valGB);
+    ScaOpAssign *assigner = new ScaOpAssign(sum, adder);
+
+    ILValue *count = new MultiLValue(Int, "Count", groupbyCols);
+    ScaOpAdd *adderOne = new ScaOpAdd(count, new IntValue(1));
+    ScaOpAssign *assignerCount = new ScaOpAssign(count, adderOne);
+
+    vector<string> colNames2;
+    colNames2.push_back("Agency");
+    colNames2.push_back("Units");
+    colNames2.push_back("Sum");
+    colNames2.push_back("Count");
+    colNames2.push_back("Val Bucket");
+    vector<Type> colTypes2;
+    colTypes2.push_back(String);
+    colTypes2.push_back(String);
+    colTypes2.push_back(Int);
+    colTypes2.push_back(Int);
+    colTypes2.push_back(Int);
+    vector<IScalar*> trees2;
+    trees2.push_back(industryGB);
+    trees2.push_back(unitsGB);
+    trees2.push_back(assigner);
+    trees2.push_back(assignerCount);
+    trees2.push_back(binner);
+
+    CProject *projector2 = new CProject(*projector, colNames2, colTypes2, trees2, true);
+
+    CMultiGroupBy *grouper = new CMultiGroupBy(*projector2);
+
+    JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>* tree = new JobEval<IRelOp, vector<IAccessor*>*, vector<IVariable*>>();
+    vector<IVariable*> params;
+    CCSVSerializer *serializer = new CCSVSerializer();
+    serializer->serialize(writeFilePath, *(tree->evalTree(grouper, params))->at(0));
+}
+
 
 
 /*

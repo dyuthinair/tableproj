@@ -23,7 +23,7 @@ bool Tokenizer::HasMore()
 string Tokenizer::GetToken(vector<char> delimeters)
 {
     if (!Tokenizer::HasMore())
-        throw "No more token";
+        throw std::invalid_argument ("No more token");
 
     bool quoteIndex = false;
     for(; currentChar != line.end(); currentChar++)

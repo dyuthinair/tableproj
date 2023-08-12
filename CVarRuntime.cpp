@@ -35,5 +35,5 @@ void CVarRuntime::Update(const Record& value) {
 }
 
 void CVarRuntime::Combine(Record* value) {
-    throw("How to combine CVarRunTIme?");
+    throw std::invalid_argument("How to combine CVarRunTIme?");
 }

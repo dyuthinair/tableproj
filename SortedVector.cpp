@@ -82,7 +82,7 @@ void SortedVector::AddRecord(Record* curRecord) {
         } else if(compOutput == -1) {
             highIndex = mid - 1;
         } else {
-            throw("Issue with scalar comparator");
+            throw std::invalid_argument("Issue with scalar comparator");
         }
     }
 }

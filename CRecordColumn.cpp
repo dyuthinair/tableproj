@@ -64,7 +64,7 @@ int CRecordColumn::Comp(IScalar& rhs) {
             ITracer::GetTracer()->Trace("CRecordColumn::Comp result %d\n", comp); 
             break;
         case EnumCount:
-            throw("Not a real type");
+            throw std::invalid_argument("Not a real type");
             break;
     }
     return comp;
@@ -78,6 +78,6 @@ int CRecordColumn::normalizeEval(int difference) {
     } else if (difference < 0) {
         return -1;
     } else {
-        throw("Unreachable code");
+        throw std::invalid_argument("Unreachable code");
     }
 }
