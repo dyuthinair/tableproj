@@ -746,7 +746,7 @@ void binDatetime() {
 
 void multiGroupByBinTest() {
     string readFilePath = "..\\testdata\\annual-enterprise-survey-2021-financial-year-provisional-csv.csv";
-    string writeFilePath = "..\\testdata\\count_by_industry.csv";
+    string writeFilePath = "..\\testdata\\count_by_industry_bin.csv";
 
     unique_ptr<CMemTable> table(new CMemTable("Without Size Bands"));
     CCSVDeserializer *deserializer = new CCSVDeserializer();
@@ -765,7 +765,7 @@ void multiGroupByBinTest() {
     vector<string> colNames;
     colNames.push_back("Agency");
     colNames.push_back("Units");
-    colNames.push_back("Sum");
+    colNames.push_back("Value");
     colNames.push_back("Val Bucket");
     vector<Type> colTypes;
     colTypes.push_back(String);
@@ -778,9 +778,9 @@ void multiGroupByBinTest() {
     trees.push_back(val);
     trees.push_back(binner);
 
-    CProject *projector = new CProject(*accessorRelOp, colNames, colTypes, trees, true);
+    CProject *projector = new CProject(*accessorRelOp, colNames, colTypes, trees, false);
 
-    CVarRef *industryGB = new CVarRef(String, "Industry_name_NZSIOC");
+    CVarRef *industryGB = new CVarRef(String, "Agency");
     CVarRef *unitsGB = new CVarRef(String, "Units");
     CVarRef *valGB = new CVarRef(Int, "Value");
     CVarRef *buckets = new CVarRef(Int, "Val Bucket");
@@ -816,7 +816,7 @@ void multiGroupByBinTest() {
     trees2.push_back(unitsGB);
     trees2.push_back(assigner);
     trees2.push_back(assignerCount);
-    trees2.push_back(binner);
+    trees2.push_back(buckets);
 
     CProject *projector2 = new CProject(*projector, colNames2, colTypes2, trees2, true);
 
